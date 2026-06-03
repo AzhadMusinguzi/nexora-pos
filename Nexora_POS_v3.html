@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#070b12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Nexora POS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* ══════════════════════════════════════════
+   NEXORA POS v3 · Design System
+══════════════════════════════════════════ */
+:root{
+  --bg:#070b12;--surface:#0f1623;--surface2:#161e2e;--surface3:#1c2538;
+  --border:#1f2d42;--border2:#2a3a54;
+  --brand:#4f46e5;--brand2:#818cf8;--brand-glow:rgba(79,70,229,.25);
+  --gold:#f59e0b;--gold-bg:rgba(245,158,11,.1);--gold-border:rgba(245,158,11,.25);
+  --green:#10b981;--green-bg:rgba(16,185,129,.1);--green-border:rgba(16,185,129,.25);
+  --red:#f43f5e;--red-bg:rgba(244,63,94,.1);--red-border:rgba(244,63,94,.25);
+  --amber:#f59e0b;--amber-bg:rgba(245,158,11,.1);--amber-border:rgba(245,158,11,.25);
+  --text:#f1f5f9;--text2:#94a3b8;--text3:#475569;
+  --radius:12px;--radius-sm:8px;--radius-xs:6px;
+  --shadow:0 8px 32px rgba(0,0,0,.4);--shadow-sm:0 2px 8px rgba(0,0,0,.3);
+  --font:'Outfit',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+
+/* ── SPLASH ── */
+#splash{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;position:relative;overflow:hidden;background:var(--bg)}
+#splash::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(79,70,229,.18) 0%,transparent 55%),radial-gradient(ellipse at 80% 20%,rgba(16,185,129,.1) 0%,transparent 55%),radial-gradient(ellipse at 60% 85%,rgba(245,158,11,.08) 0%,transparent 50%);animation:orb 9s ease-in-out infinite alternate;pointer-events:none}
+#splash::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(79,70,229,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(79,70,229,.04) 1px,transparent 1px);background-size:44px 44px;pointer-events:none}
+@keyframes orb{0%{transform:scale(1) translate(0,0)}100%{transform:scale(1.08) translate(-2%,2%)}}
+
+.splash-logo{position:relative;z-index:1;text-align:center;margin-bottom:8px}
+.splash-logo-text{font-size:52px;font-weight:900;letter-spacing:4px;font-style:italic;background:linear-gradient(135deg,#818cf8 0%,#10b981 50%,#f59e0b 100%);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:logoGrad 5s ease infinite}
+@keyframes logoGrad{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.splash-pos-tag{font-size:10px;font-weight:700;letter-spacing:7px;color:var(--brand2);text-transform:uppercase;margin-bottom:4px;text-align:center;position:relative;z-index:1}
+.splash-tagline{font-size:10px;color:var(--text3);letter-spacing:3px;text-transform:uppercase;margin-bottom:32px;position:relative;z-index:1}
+
+.splash-card{position:relative;z-index:1;background:rgba(15,22,35,.8);border:1px solid rgba(79,70,229,.2);border-radius:16px;padding:28px 24px;width:100%;max-width:380px;backdrop-filter:blur(24px);box-shadow:0 0 0 1px rgba(79,70,229,.05),0 24px 64px rgba(0,0,0,.5)}
+.splash-card h2{color:var(--text);font-size:17px;font-weight:700;margin-bottom:4px}
+.splash-card p{color:var(--text3);font-size:12px;margin-bottom:18px}
+
+.pin-dots{display:flex;gap:14px;justify-content:center;margin:16px 0}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2);background:transparent;transition:all .2s}
+.pin-dot.on{background:var(--brand);border-color:var(--brand);box-shadow:0 0 10px var(--brand-glow)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.pin-btn{padding:16px;font-size:20px;font-weight:700;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--text);cursor:pointer;font-family:var(--font);transition:all .15s}
+.pin-btn:hover,.pin-btn:active{background:rgba(79,70,229,.25);border-color:var(--brand);transform:scale(.96)}
+.pin-err{color:var(--red);font-size:12px;text-align:center;margin-top:8px;min-height:18px;font-weight:500}
+
+/* ── LAYOUT ── */
+#app{display:none;height:100vh;max-width:560px;margin:0 auto;background:var(--surface);flex-direction:column;overflow:hidden}
+@media(min-width:1100px){#app{max-width:100%;flex-direction:row}}
+
+/* ── SIDEBAR ── */
+#sidebar{display:none;width:228px;background:var(--bg);flex-direction:column;flex-shrink:0;border-right:1px solid var(--border)}
+@media(min-width:1100px){#sidebar{display:flex}}
+.sb-logo{padding:22px 18px 16px;border-bottom:1px solid var(--border)}
+.sb-logo-text{font-size:26px;font-weight:900;letter-spacing:2px;font-style:italic;background:linear-gradient(135deg,#818cf8,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sb-pos-tag{font-size:9px;font-weight:700;letter-spacing:5px;color:var(--brand2);text-transform:uppercase;margin-top:1px}
+.sb-biz{padding:10px 16px;font-size:12px;color:var(--text2);font-weight:500;background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-nav{flex:1;padding:10px 8px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;color:var(--text3);font-size:13px;font-weight:500;border:none;background:transparent;width:100%;text-align:left;font-family:var(--font);transition:all .15s;border-radius:8px;margin-bottom:2px;position:relative}
+.sb-item:hover{background:var(--surface2);color:var(--text2)}
+.sb-item.active{background:rgba(79,70,229,.12);color:var(--brand2);font-weight:600}
+.sb-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--brand);border-radius:0 3px 3px 0}
+.sb-icon{width:20px;text-align:center;font-size:16px}
+.sb-foot{padding:12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
+
+/* ── MAIN ── */
+#main{display:flex;flex-direction:column;flex:1;min-width:0;overflow:hidden}
+
+/* ── TOPBAR ── */
+#topbar{background:var(--surface);padding:13px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid var(--border)}
+.tb-biz{color:var(--text);font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.tb-brand{font-size:12px;font-weight:800;letter-spacing:1px;background:linear-gradient(135deg,var(--brand2),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+@media(min-width:1100px){.tb-brand{display:none}}
+.tb-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+
+/* ── FLASH ── */
+#flash{display:none;padding:10px 16px;font-size:12px;font-weight:600;flex-shrink:0;animation:fadeIn .2s ease}
+.flash-ok{background:var(--green-bg);color:var(--green);border-bottom:1px solid var(--green-border)}
+.flash-err{background:var(--red-bg);color:var(--red);border-bottom:1px solid var(--red-border)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── STATUS STRIP ── */
+#status-strip{display:flex;gap:8px;align-items:center;padding:7px 14px;background:var(--bg);border-bottom:1px solid var(--border);font-size:10px;color:var(--text3);flex-shrink:0;flex-wrap:wrap}
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--border);font-weight:600;color:var(--text2);font-size:10px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.status-dot.off{background:var(--amber)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.status-dot.live{animation:pulse 1.5s ease infinite}
+
+/* ── CONTENT ── */
+#content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;background:var(--bg)}
+@media(min-width:1100px){#content{padding:24px}}
+.tab-enter{animation:tabIn .2s ease}
+@keyframes tabIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── BOTTOM NAV ── */
+#bottom-nav{display:flex;background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
+@media(min-width:1100px){#bottom-nav{display:none}}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 2px 7px;cursor:pointer;border:none;background:transparent;color:var(--text3);font-size:9px;font-weight:500;font-family:var(--font);transition:all .15s;position:relative}
+.nav-btn.active{color:var(--brand2)}
+.nav-btn.active::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:var(--brand);border-radius:0 0 4px 4px}
+.nav-icon{font-size:19px;line-height:1}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.card-title{font-size:11px;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);display:flex;align-items:center;gap:6px}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+@media(min-width:768px){.kpi-grid{grid-template-columns:repeat(4,1fr)}}
+.kpi{background:var(--surface2);border-radius:10px;padding:14px;border:1px solid var(--border);position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--brand),transparent)}
+.kpi-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-weight:600}
+.kpi-value{font-size:20px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── OPS GRID ── */
+.ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+@media(min-width:768px){.ops-grid{grid-template-columns:repeat(4,1fr)}}
+.ops-btn{border:1px solid var(--border);background:var(--surface);border-radius:var(--radius);padding:14px;text-align:left;cursor:pointer;font-family:var(--font);min-height:72px;transition:all .2s;position:relative;overflow:hidden}
+.ops-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(79,70,229,.06),transparent);opacity:0;transition:opacity .2s}
+.ops-btn:hover{border-color:var(--brand);transform:translateY(-1px);box-shadow:0 4px 16px var(--brand-glow)}
+.ops-btn:hover::after{opacity:1}
+.ops-ico{font-size:20px;margin-bottom:6px}
+.ops-title{font-size:12px;font-weight:800;color:var(--text)}
+.ops-sub{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ── INSIGHT CARDS ── */
+.insight-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px}
+@media(min-width:768px){.insight-grid{grid-template-columns:repeat(3,1fr)}}
+.insight-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.insight-card.warn{border-color:var(--amber-border);background:var(--amber-bg)}
+.insight-card.danger{border-color:var(--red-border);background:var(--red-bg)}
+.insight-label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-weight:700;margin-bottom:6px}
+.insight-value{font-size:20px;font-weight:800;color:var(--text)}
+.insight-note{font-size:11px;color:var(--text3);margin-top:4px}
+
+/* ── LIST ROWS ── */
+.list-row{padding:11px 0;border-bottom:1px solid var(--surface2);display:flex;align-items:center;gap:8px;transition:background .1s}
+.list-row:last-child{border-bottom:none}
+.row-main{flex:1;min-width:0}
+.row-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-sub{font-size:11px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-right{text-align:right;flex-shrink:0}
+.row-val{font-size:13px;font-weight:700;color:var(--gold)}
+.row-profit{font-size:10px;margin-top:2px;font-weight:600}
+
+/* ── BADGES ── */
+.badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;display:inline-block;letter-spacing:.03em}
+.badge-ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.badge-low{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.badge-out{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.badge-shop{background:rgba(79,70,229,.15);color:var(--brand2);border:1px solid var(--brand-glow)}
+
+/* ── BUTTONS ── */
+button.btn{font-family:var(--font);cursor:pointer;font-size:13px;border-radius:var(--radius-sm);padding:9px 14px;border:1px solid var(--border);background:var(--surface2);color:var(--text);transition:all .15s;outline:none;font-weight:500}
+button.btn:hover{border-color:var(--border2);background:var(--surface3)}
+button.btn:active{transform:scale(.97)}
+button.btn-primary{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:600}
+button.btn-primary:hover{background:#4338ca;border-color:#4338ca;box-shadow:0 4px 12px var(--brand-glow)}
+button.btn-danger{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+button.btn-danger:hover{background:rgba(244,63,94,.2)}
+button.btn-sm{padding:5px 10px;font-size:11px}
+button.btn-block{width:100%;display:block;text-align:center}
+button.btn-outline{background:transparent;color:var(--brand2);border-color:var(--brand)}
+button.btn-outline:hover{background:var(--brand-glow)}
+button.btn-ghost{background:transparent;border-color:transparent;color:var(--text3)}
+button.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.btn-row .btn{flex:1 1 140px}
+
+/* ── FORMS ── */
+input,select{font-family:var(--font);font-size:13px;padding:9px 11px;border:1px solid var(--border2);border-radius:var(--radius-sm);outline:none;background:var(--surface2);color:var(--text);width:100%;transition:border .15s}
+input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-glow)}
+input::placeholder{color:var(--text3)}
+label{font-size:11px;color:var(--text3);display:block;margin-bottom:4px;font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+.form-group{margin-bottom:10px}
+select option{background:var(--surface2)}
+
+/* ── INFO BOXES ── */
+.preview-box{background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--green);margin:8px 0}
+.info-box{background:rgba(79,70,229,.08);border:1px dashed var(--brand);border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:var(--brand2);margin-bottom:12px;line-height:1.6}
+.warn-box{background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:var(--amber);margin-bottom:12px;line-height:1.6}
+.cost-box{background:rgba(79,70,229,.06);border:1px solid var(--brand-glow);border-radius:var(--radius-sm);padding:12px;margin-bottom:12px}
+.cost-row{display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px;color:var(--text2)}
+.cost-total{border-top:1px solid var(--border2);margin-top:8px;padding-top:8px;display:flex;justify-content:space-between;font-weight:800;font-size:14px;color:var(--text)}
+
+/* ── PROGRESS BARS ── */
+.rbar-wrap{margin-bottom:12px}
+.rbar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;font-weight:500;color:var(--text2)}
+.rbar{height:6px;background:var(--surface3);border-radius:999px;overflow:hidden}
+.rbar-fill{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:999px;transition:width .4s ease}
+
+/* ── DARK PANEL ── */
+.dark-panel{background:linear-gradient(135deg,rgba(79,70,229,.1),rgba(16,185,129,.05));border-radius:var(--radius);padding:16px;margin-bottom:14px;border:1px solid var(--brand-glow)}
+.dp-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;font-weight:600}
+.dp-value{font-size:16px;font-weight:800;color:var(--gold)}
+.dp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.dp-item{background:rgba(255,255,255,.03);border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
+
+/* ── FILTERS ── */
+.filter-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.filter-btn{flex:1;font-size:11px;padding:6px 4px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-family:var(--font);text-align:center;color:var(--text3);transition:all .15s;white-space:nowrap}
+.filter-btn.active{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:600}
+.filter-btn:hover:not(.active){border-color:var(--border2);color:var(--text2)}
+
+/* ── MODALS ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex;animation:fadeIn .2s ease}
+@media(min-width:768px){.modal-bg{align-items:center}}
+.modal{background:var(--surface);border-radius:16px 16px 0 0;padding:22px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;border:1px solid var(--border)}
+@media(min-width:768px){.modal{border-radius:var(--radius)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-title{font-size:16px;font-weight:800;color:var(--text)}
+.modal-x{font-size:22px;background:none;border:none;color:var(--text3);cursor:pointer;line-height:1;padding:0 4px;font-family:var(--font);transition:color .15s}
+.modal-x:hover{color:var(--text)}
+
+/* ── AUTOCOMPLETE ── */
+.ac-wrap{position:relative}
+.ac-drop{display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);box-shadow:var(--shadow);z-index:300;max-height:220px;overflow-y:auto}
+.ac-drop.open{display:block;animation:fadeIn .15s ease}
+.ac-item{padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border);color:var(--text2);transition:all .1s}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover,.ac-item.hi{background:rgba(79,70,229,.1);color:var(--brand2)}
+
+/* ── MISC ── */
+.empty{text-align:center;padding:40px 16px;color:var(--text3)}
+.empty-icon{font-size:40px;display:block;margin-bottom:10px}
+.section-sub{font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.6}
+
+/* ── RECEIPT PRINT ── */
+@media print{
+  body>*:not(#receipt-modal){display:none!important}
+  #receipt-modal{position:static!important;background:none!important;display:block!important;padding:0!important}
+  #receipt-modal .modal{box-shadow:none;border:none;border-radius:0;max-height:none}
+  .receipt-no-print{display:none!important}
+  #receipt-modal .modal-bg{display:block!important}
+}
+
+/* ── AI ── */
+.ai-mode-row{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px}
+.ai-mode-btn{flex-shrink:0;padding:7px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);color:var(--text3);transition:all .2s;white-space:nowrap}
+.ai-mode-btn.active{background:linear-gradient(135deg,var(--brand),#7c3aed);border-color:transparent;color:#fff;box-shadow:0 2px 12px var(--brand-glow)}
+.ai-chat-wrap{display:flex;flex-direction:column;gap:0;height:calc(100vh - 340px);min-height:260px;max-height:520px;overflow-y:auto;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border);padding:12px;margin-bottom:10px}
+.ai-msg{display:flex;gap:8px;margin-bottom:12px;animation:fadeIn .2s ease}
+.ai-msg.user{flex-direction:row-reverse}
+.ai-bubble{max-width:82%;padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.6}
+.ai-msg.ai .ai-bubble{background:var(--surface2);border:1px solid var(--border);border-bottom-left-radius:4px;color:var(--text)}
+.ai-msg.user .ai-bubble{background:linear-gradient(135deg,var(--brand),#7c3aed);color:#fff;border-bottom-right-radius:4px}
+.ai-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px}
+.ai-avatar.bot{background:linear-gradient(135deg,var(--brand),#7c3aed)}
+.ai-avatar.usr{background:var(--surface3);border:1px solid var(--border)}
+.ai-typing{display:flex;gap:4px;padding:10px 13px;align-items:center}
+.ai-dot{width:7px;height:7px;border-radius:50%;background:var(--brand2);animation:aiDot 1.2s ease infinite}
+.ai-dot:nth-child(2){animation-delay:.2s}
+.ai-dot:nth-child(3){animation-delay:.4s}
+@keyframes aiDot{0%,80%,100%{transform:scale(.8);opacity:.4}40%{transform:scale(1.1);opacity:1}}
+.ai-input-row{display:flex;gap:8px}
+.ai-input-row input{flex:1}
+.ai-chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.ai-chip{padding:6px 12px;border-radius:999px;border:1px solid var(--border2);background:var(--surface2);font-size:11px;cursor:pointer;font-family:var(--font);color:var(--text2);transition:all .15s;white-space:nowrap}
+.ai-chip:hover{border-color:var(--brand);color:var(--brand2);background:var(--brand-glow)}
+.ai-insight{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;position:relative;overflow:hidden}
+.ai-insight::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--brand),#7c3aed)}
+.ai-insight-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--brand2);font-weight:700;margin-bottom:6px}
+.ai-insight-text{font-size:13px;color:var(--text);line-height:1.6}
+.ai-alert{background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius);padding:12px;margin-bottom:8px}
+.ai-alert-title{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.ai-alert-text{font-size:12px;color:var(--text2);line-height:1.5}
+.ai-key-gate{text-align:center;padding:30px 16px}
+.ai-key-gate-icon{font-size:48px;margin-bottom:12px}
+.ai-key-gate-title{font-size:18px;font-weight:800;margin-bottom:6px}
+.ai-key-gate-sub{font-size:12px;color:var(--text3);margin-bottom:20px;line-height:1.6}
+.ai-scanning{text-align:center;padding:20px;color:var(--text3);font-size:13px}
+.ai-scan-ring{width:48px;height:48px;border:3px solid var(--border2);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-section-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:16px 0 8px;padding-left:2px}
+</style>
+</head>
+<body>
+
+<!-- ════ SPLASH / SETUP ════ -->
+<div id="splash">
+  <div class="splash-logo">
+    <div class="splash-logo-text">Nexora</div>
+  </div>
+  <div class="splash-pos-tag">POS System</div>
+  <div class="splash-tagline">Intelligent Business Infrastructure</div>
+  <div class="splash-card">
+    <h2 id="splash-title">Welcome</h2>
+    <p id="splash-sub">Create your business profile to get started.</p>
+    <div id="setup-form">
+      <div class="form-group"><label>Business Name</label><input id="setup-name" type="text" placeholder="e.g. AK Cosmetics" maxlength="60" autocomplete="organization"></div>
+      <div class="form-group"><label>Currency</label>
+        <select id="setup-currency">
+          <option value="UGX">UGX — Ugandan Shillings</option>
+          <option value="KES">KES — Kenyan Shillings</option>
+          <option value="TZS">TZS — Tanzanian Shillings</option>
+          <option value="RWF">RWF — Rwandan Francs</option>
+          <option value="USD">USD — US Dollar</option>
+          <option value="GBP">GBP — British Pound</option>
+        </select>
+      </div>
+      <div class="form-group"><label>4-Digit PIN</label><input id="setup-pin" type="password" maxlength="4" placeholder="Choose a PIN" autocomplete="new-password"></div>
+      <button class="btn btn-primary btn-block" id="create-biz-btn" style="margin-top:6px">Create Business →</button>
+    </div>
+    <div id="pin-form" style="display:none">
+      <p id="pin-biz-name" style="color:var(--text);font-weight:700;font-size:15px;margin-bottom:4px"></p>
+      <p style="color:var(--text3);font-size:11px">Use keypad or keyboard digits</p>
+      <div class="pin-dots" id="pin-dots">
+        <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+      </div>
+      <div class="pin-pad">
+        <button class="pin-btn" data-pin="1">1</button><button class="pin-btn" data-pin="2">2</button><button class="pin-btn" data-pin="3">3</button>
+        <button class="pin-btn" data-pin="4">4</button><button class="pin-btn" data-pin="5">5</button><button class="pin-btn" data-pin="6">6</button>
+        <button class="pin-btn" data-pin="7">7</button><button class="pin-btn" data-pin="8">8</button><button class="pin-btn" data-pin="9">9</button>
+        <button class="pin-btn" style="visibility:hidden"></button><button class="pin-btn" data-pin="0">0</button>
+        <button class="pin-btn" id="pin-del-btn">⌫</button>
+      </div>
+      <div class="pin-err" id="pin-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MAIN APP ════ -->
+<div id="app">
+  <div id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-text">Nexora</div>
+      <div class="sb-pos-tag">POS</div>
+    </div>
+    <div class="sb-biz" id="sb-biz-name"></div>
+    <div class="sb-nav" id="sb-nav"></div>
+    <div class="sb-foot">
+      <button class="btn btn-sm btn-ghost btn-block" id="sb-calc-btn">🧮 Calculator</button>
+      <button class="btn btn-sm btn-ghost btn-block" id="sb-lock-btn">🔒 Lock</button>
+    </div>
+  </div>
+  <div id="main">
+    <div id="topbar">
+      <div class="tb-biz" id="tb-biz-name"></div>
+      <div class="tb-actions">
+        <button class="btn btn-sm btn-ghost" id="tb-calc-btn">🧮</button>
+        <span class="tb-brand">Nexora POS</span>
+      </div>
+    </div>
+    <div id="flash"></div>
+    <div id="status-strip" class="status-strip"></div>
+    <div id="content"></div>
+    <div id="bottom-nav"></div>
+  </div>
+</div>
+
+<!-- ════ ALERT MODAL ════ -->
+<div class="modal-bg" id="alert-modal">
+  <div class="modal" style="max-width:380px" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title" id="alert-title">Notice</span>
+    </div>
+    <p id="alert-msg" style="color:var(--text2);font-size:14px;line-height:1.6;margin-bottom:18px"></p>
+    <button class="btn btn-primary btn-block" id="alert-ok">OK</button>
+  </div>
+</div>
+
+<!-- ════ CONFIRM MODAL ════ -->
+<div class="modal-bg" id="confirm-modal">
+  <div class="modal" style="max-width:380px" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title" id="confirm-title">Confirm</span>
+    </div>
+    <p id="confirm-msg" style="color:var(--text2);font-size:14px;line-height:1.6;margin-bottom:18px"></p>
+    <div class="btn-row">
+      <button class="btn btn-outline" id="confirm-no">Cancel</button>
+      <button class="btn btn-danger" id="confirm-yes">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PRODUCT MODAL ════ -->
+<div class="modal-bg" id="prod-modal">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title" id="prod-modal-title">Add Product</span>
+      <button class="modal-x" id="prod-modal-close">✕</button>
+    </div>
+    <div class="form-group"><label>Product Name *</label><input id="pm-name" type="text" placeholder="e.g. TITANIC SHORT" maxlength="80"></div>
+    <div class="form-group"><label>Art Number (optional)</label><input id="pm-art" type="text" placeholder="e.g. OLU272-129" maxlength="40"></div>
+    <div style="display:flex;gap:8px">
+      <div class="form-group" style="flex:1"><label>CTNs</label><input id="pm-ctns" type="number" min="0" placeholder="5"></div>
+      <div class="form-group" style="flex:1"><label>Pcs / CTN</label><input id="pm-ppc" type="number" min="1" placeholder="192"></div>
+    </div>
+    <div class="form-group"><label>Total Cost USD (from supplier)</label><input id="pm-usd" type="number" min="0" step="0.01" placeholder="312.96"></div>
+    <div class="cost-box" id="pm-cost-box">
+      <div style="font-weight:700;color:var(--brand2);margin-bottom:8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Auto Cost Calculation</div>
+      <div class="cost-row"><span>USD × Rate</span><strong id="pm-ugx">0</strong></div>
+      <div class="cost-row"><span>÷ CTNs</span><strong id="pm-upc">0 / CTN</strong></div>
+      <div class="cost-row"><span>+ Expense / CTN</span><strong id="pm-epc">0</strong></div>
+      <div class="cost-total"><span>Cost Price / CTN</span><span id="pm-cost">0</span></div>
+    </div>
+    <div class="form-group"><label>Sell Price / CTN (manual)</label><input id="pm-sell" type="number" min="0" placeholder="enter selling price"></div>
+    <button class="btn btn-primary btn-block" id="pm-save-btn">Add Product →</button>
+  </div>
+</div>
+
+<!-- ════ CALCULATOR MODAL ════ -->
+<div class="modal-bg" id="calc-modal">
+  <div class="modal" style="max-width:320px" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">🧮 Calculator</span>
+      <button class="modal-x" id="calc-close-btn">✕</button>
+    </div>
+    <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:12px;text-align:right;border:1px solid var(--border)">
+      <div id="calc-expr" style="font-size:11px;color:var(--text3);min-height:16px;font-family:monospace"></div>
+      <div id="calc-result" style="font-size:30px;font-weight:800;color:var(--gold)">0</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <button class="btn" data-cv="7">7</button><button class="btn" data-cv="8">8</button><button class="btn" data-cv="9">9</button><button class="btn btn-outline" data-cv="/">÷</button>
+      <button class="btn" data-cv="4">4</button><button class="btn" data-cv="5">5</button><button class="btn" data-cv="6">6</button><button class="btn btn-outline" data-cv="*">×</button>
+      <button class="btn" data-cv="1">1</button><button class="btn" data-cv="2">2</button><button class="btn" data-cv="3">3</button><button class="btn btn-outline" data-cv="-">−</button>
+      <button class="btn" data-cv="0">0</button><button class="btn" data-cv=".">.</button><button class="btn btn-danger" id="calc-del">⌫</button><button class="btn btn-outline" data-cv="+">+</button>
+      <button class="btn btn-danger" id="calc-clear" style="grid-column:span 2">C</button>
+      <button class="btn btn-primary" id="calc-eq" style="grid-column:span 2">=</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ RECEIPT MODAL ════ -->
+<div class="modal-bg" id="receipt-modal">
+  <div class="modal" style="max-width:380px" onclick="event.stopPropagation()">
+    <div class="modal-header receipt-no-print">
+      <span class="modal-title">🧾 Receipt</span>
+      <button class="modal-x" id="receipt-close-btn">✕</button>
+    </div>
+    <div id="receipt-content"></div>
+    <div class="btn-row receipt-no-print" style="margin-top:16px">
+      <button class="btn btn-outline" id="receipt-print-btn">🖨 Print</button>
+      <button class="btn btn-ghost" id="receipt-close-btn2">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ INVOICE SCAN MODAL ════ -->
+<div class="modal-bg" id="scan-modal">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">📷 Scan Invoice / Packing List</span>
+      <button class="modal-x" id="scan-close-btn">✕</button>
+    </div>
+    <div class="section-sub">Take a clear photo of your supplier invoice or packing list. AI will read it and fill in all products automatically.</div>
+    <div class="form-group">
+      <label>Photo of Invoice</label>
+      <input type="file" accept="image/*" capture="environment" id="scan-file-input" style="font-size:12px;padding:6px;width:100%;color:var(--text2)">
+    </div>
+    <div id="scan-preview" style="margin-bottom:10px"></div>
+    <div id="scan-result"></div>
+    <button class="btn btn-primary btn-block" id="scan-go-btn" style="display:none">🤖 Read with AI →</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+// STORAGE
+// ════════════════════════════════════════════════════
+const NS = 'nxr3_';
+const sv = (k,v) => { try{ localStorage.setItem(NS+k, JSON.stringify(v)); }catch(e){} };
+const ld = (k,d) => { try{ const v=localStorage.getItem(NS+k); return v!=null?JSON.parse(v):d; }catch(e){ return d; } };
+
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+let state = {
+  businesses: ld('businesses',[]),
+  activeBizId: ld('activeBizId',null),
+  cloud: ld('cloud',{url:'',anonKey:'',systemId:'nexora-main',email:'',lastSync:null}),
+  aiKey: ld('aiKey',''),
+  aiChat: [],
+  aiMode: 'chat',
+  tab: 'dashboard',
+  pinInput: '',
+  editingProdId: null,
+  stockFilter: 'all',
+  retailMode: 'sale',
+  calcExpr: '',
+};
+
+const biz = () => state.businesses.find(b => b.id === state.activeBizId) || null;
+const uid = () => (typeof crypto.randomUUID === 'function') ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2,10);
+const cur = () => biz()?.currency || 'UGX';
+const fmt = n => Math.round(n||0).toLocaleString();
+const fmtC = n => cur()+' '+fmt(n);
+const fmtD = d => { try{ return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }catch(e){ return d; } };
+const today = () => new Date().toISOString().split('T')[0];
+const cloudReady = () => !!(state.cloud?.url && state.cloud?.anonKey);
+const lastSyncText = () => state.cloud?.lastSync ? fmtD(state.cloud.lastSync) : 'Not synced';
+
+// ════════════════════════════════════════════════════
+// SECURITY HELPERS
+// ════════════════════════════════════════════════════
+// PIN hashing — SHA-256 via Web Crypto API
+const hashPin = async pin => {
+  const enc = new TextEncoder().encode(String(pin));
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+};
+
+// XSS sanitizer — escapes all HTML special characters
+const S = str => String(str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// Safe math evaluator — no eval() or Function() used
+const evalMath = expr => {
+  const toks = [];
+  let i = 0, s = String(expr).trim();
+  while(i < s.length){
+    if(/\s/.test(s[i])){ i++; continue; }
+    if(/[\d.]/.test(s[i])){ let n=''; while(i<s.length&&/[\d.]/.test(s[i]))n+=s[i++]; toks.push({t:'n',v:parseFloat(n)}); }
+    else if('+-*/()'.includes(s[i])){ toks.push({t:'o',v:s[i++]}); }
+    else throw new Error('Invalid character: '+s[i]);
+  }
+  let p=0;
+  const peek=()=>toks[p]?.v;
+  const eat=()=>toks[p++];
+  const parseE=()=>{ let l=parseT(); while(peek()==='+'||peek()==='-'){const op=eat().v;const r=parseT();l=op==='+'?l+r:l-r;} return l; };
+  const parseT=()=>{ let l=parseU(); while(peek()==='*'||peek()==='/'){const op=eat().v;const r=parseU();if(op==='/'&&r===0)throw new Error('Division by zero');l=op==='*'?l*r:l/r;} return l; };
+  const parseU=()=>{ if(peek()==='-'){eat();return -parseF();} if(peek()==='+'){eat();return parseF();} return parseF(); };
+  const parseF=()=>{ if(peek()==='('){eat();const v=parseE();if(peek()!==')')throw new Error('Missing )');eat();return v;} const t=eat(); if(!t||t.t!=='n')throw new Error('Expected number'); return t.v; };
+  const result=parseE();
+  if(p!==toks.length)throw new Error('Unexpected token');
+  return result;
+};
+
+// ════════════════════════════════════════════════════
+// CUSTOM MODALS (replace browser alert/confirm)
+// ════════════════════════════════════════════════════
+const showAlert = (msg, title='Notice') => new Promise(resolve => {
+  document.getElementById('alert-title').textContent = title;
+  document.getElementById('alert-msg').textContent = msg;
+  document.getElementById('alert-modal').classList.add('open');
+  const btn = document.getElementById('alert-ok');
+  const handler = () => { document.getElementById('alert-modal').classList.remove('open'); btn.removeEventListener('click',handler); resolve(); };
+  btn.addEventListener('click', handler);
+});
+
+const showConfirm = (msg, title='Confirm') => new Promise(resolve => {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').textContent = msg;
+  document.getElementById('confirm-modal').classList.add('open');
+  const yes=document.getElementById('confirm-yes'), no=document.getElementById('confirm-no');
+  const cleanup = val => { document.getElementById('confirm-modal').classList.remove('open'); yes.removeEventListener('click',yH); no.removeEventListener('click',nH); resolve(val); };
+  const yH=()=>cleanup(true), nH=()=>cleanup(false);
+  yes.addEventListener('click',yH); no.addEventListener('click',nH);
+});
+
+// ════════════════════════════════════════════════════
+// FLASH + STATUS
+// ════════════════════════════════════════════════════
+let flashTimer = null;
+const flash = (msg, type='ok') => {
+  const el = document.getElementById('flash');
+  el.className = type==='ok' ? 'flash-ok' : 'flash-err';
+  el.textContent = (type==='ok'?'✓ ':'⚠ ') + msg;
+  el.style.display = 'block';
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(()=>el.style.display='none', 3500);
+};
+
+const updateStatusStrip = () => {
+  const el = document.getElementById('status-strip'); if(!el)return;
+  const online = navigator.onLine, cloud = cloudReady();
+  el.innerHTML = `
+    <span class="status-pill"><span class="status-dot ${online?'live':'off'}"></span>${online?'Online':'Offline'}</span>
+    <span class="status-pill"><span class="status-dot ${cloud?'live':'off'}"></span>${cloud?'Cloud ready':'Local mode'}</span>
+    <span style="margin-left:auto;font-size:10px">Last sync: <strong>${lastSyncText()}</strong></span>`;
+};
+
+// ════════════════════════════════════════════════════
+// SAVE
+// ════════════════════════════════════════════════════
+const save = () => { sv('businesses',state.businesses); sv('activeBizId',state.activeBizId); };
+const updateBiz = fn => { state.businesses = state.businesses.map(b=>b.id===state.activeBizId?fn(b):b); save(); };
+const saveCloud = () => sv('cloud',state.cloud);
+const appSnapshot = () => ({ app:'Nexora POS', version:3, exportedAt:new Date().toISOString(), activeBizId:state.activeBizId, businesses:state.businesses });
+
+// ════════════════════════════════════════════════════
+// COST HELPERS
+// ════════════════════════════════════════════════════
+const getRate = exp => (exp||[]).find(e=>e.key==='exchangeRate')?.amount || 3700;
+const getEPC = (exp,prods) => { const tc=(prods||[]).reduce((s,p)=>s+(parseInt(p.ctns)||0),0); const te=(exp||[]).filter(e=>e.key!=='exchangeRate').reduce((s,e)=>s+(e.amount||0),0); return tc>0?Math.round(te/tc):0; };
+const calcCost = (p,exp,prods) => { const rate=getRate(exp),epc=getEPC(exp,prods),ugx=Math.round((p.totalUSD||0)*rate),c=parseInt(p.ctns)||0; return c>0?Math.round(ugx/c)+epc:epc; };
+const recalcAll = (prods,exp) => (prods||[]).map(p=>({...p,costPrice:calcCost(p,exp,prods)}));
+
+// ════════════════════════════════════════════════════
+// STOCK HELPERS
+// ════════════════════════════════════════════════════
+const getStock = (p,b) => {
+  if(!p) return {remaining:0,remainingPcs:0,sold:0,soldPcs:0,consigned:0,status:'OUT'};
+  const s=b.sales||[], c=b.consignments||[], ppc=Math.max(1,parseInt(p.pcsPerCtn)||1), tc=parseInt(p.ctns)||0;
+  const soldC=s.filter(x=>x.productId===p.id&&x.type==='wholesale').reduce((a,x)=>a+(parseInt(x.ctns)||0),0);
+  const soldP=s.filter(x=>x.productId===p.id&&x.type==='retail').reduce((a,x)=>a+(parseInt(x.pieces)||0),0);
+  const cons=c.filter(x=>x.productId===p.id).reduce((a,x)=>a+(parseInt(x.ctns)||0),0);
+  const remC=Math.max(0,tc-soldC-cons), remP=Math.max(0,remC*ppc-soldP);
+  const status=remC===0?'OUT':remC<=2?'LOW':'OK';
+  return {remaining:remC,remainingPcs:remP,sold:soldC,soldPcs:soldP,consigned:cons,status};
+};
+const hasCtnStock = (p,b,n) => getStock(p,b).remaining>=(parseInt(n)||0);
+const hasPieceStock = (p,b,n) => getStock(p,b).remainingPcs>=(parseInt(n)||0);
+const badge = st => ({
+  OK:'<span class="badge badge-ok">In Stock</span>',
+  LOW:'<span class="badge badge-low">Low Stock</span>',
+  OUT:'<span class="badge badge-out">Out of Stock</span>'
+}[st]||'');
+
+// ════════════════════════════════════════════════════
+// TABS CONFIG
+// ════════════════════════════════════════════════════
+const TABS = [
+  {id:'dashboard',icon:'🏠',label:'Home'},
+  {id:'pricelist',icon:'💰',label:'Price List'},
+  {id:'sales',icon:'🧾',label:'Wholesale'},
+  {id:'retail',icon:'🏪',label:'Retail'},
+  {id:'stock',icon:'📦',label:'Stock'},
+  {id:'reports',icon:'📊',label:'Reports'},
+  {id:'ai',icon:'🤖',label:'AI'},
+  {id:'settings',icon:'⚙️',label:'Settings'},
+];
+
+// ════════════════════════════════════════════════════
+// ROUTER
+// ════════════════════════════════════════════════════
+const setTab = id => {
+  state.tab = id;
+  document.querySelectorAll('.sb-item,.nav-btn').forEach(el => el.classList.toggle('active', el.dataset.tab===id));
+  render();
+};
+
+const render = () => {
+  const b = biz(); if(!b) return;
+  const content = document.getElementById('content');
+  try {
+    const html = {
+      dashboard: renderDashboard, pricelist: renderPriceList, sales: renderSales,
+      retail: renderRetail, stock: renderStock, reports: renderReports, settings: renderSettings,
+      ai: renderAI
+    }[state.tab]?.(b) || renderDashboard(b);
+    content.innerHTML = `<div class="tab-enter">${html}</div>`;
+  } catch(e) {
+    content.innerHTML = `<div class="card" style="text-align:center;padding:30px"><div style="font-size:40px;margin-bottom:10px">⚠️</div><div style="font-weight:700;margin-bottom:6px">Something went wrong</div><div style="font-size:12px;color:var(--text3);margin-bottom:14px">${S(e.message)}</div><button class="btn btn-primary" onclick="setTab('dashboard')">Go Home</button></div>`;
+  }
+  updateStatusStrip();
+};
+
+// ════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════
+// AI ENGINE
+// ════════════════════════════════════════════════════
+let aiChat = [];
+let aiMode = 'chat';
+let aiLoading = false;
+
+const getAiKey = () => ld('aiKey','');
+const setAiKey = k => { sv('aiKey', k); };
+
+const buildBizContext = b => {
+  const sales = b.sales||[], prods = b.products||[], exp = b.expenses||[];
+  const rev = sales.reduce((a,s)=>a+(s.revenue||0),0);
+  const profit = sales.reduce((a,s)=>a+(s.profit||0),0);
+  const stockRows = prods.map(p=>({name:p.name,artNo:p.artNo||'',ctns:p.ctns,pcsPerCtn:p.pcsPerCtn,costPrice:p.costPrice||0,sellPrice:p.sellPrice||0,...getStock(p,b)}));
+  const salesSummary = prods.map(p=>{
+    const ps=sales.filter(s=>s.productId===p.id);
+    const wh=ps.filter(s=>s.type==='wholesale'), rt=ps.filter(s=>s.type==='retail');
+    return{name:p.name,totalRevenue:ps.reduce((a,s)=>a+(s.revenue||0),0),totalProfit:ps.reduce((a,s)=>a+(s.profit||0),0),wholesaleCtns:wh.reduce((a,s)=>a+(s.ctns||0),0),retailPieces:rt.reduce((a,s)=>a+(s.pieces||0),0),salesCount:ps.length};
+  }).filter(p=>p.salesCount>0);
+  const recentSales=sales.slice(-20).map(s=>({date:s.date,product:s.productName,type:s.type,qty:s.type==='wholesale'?s.ctns+' CTN':s.pieces+' pcs',revenue:s.revenue,profit:s.profit,client:s.client||''}));
+  return {businessName:b.name,currency:b.currency||'UGX',exchangeRate:getRate(exp),totalProducts:prods.length,totalRevenue:rev,totalProfit:profit,grossMarginPct:rev>0?((profit/rev)*100).toFixed(1)+'%':'0%',stock:stockRows,salesByProduct:salesSummary,recentSales,totalTransactions:sales.length,outOfStock:stockRows.filter(p=>p.status==='OUT').map(p=>p.name),lowStock:stockRows.filter(p=>p.status==='LOW').map(p=>({name:p.name,remaining:p.remaining}))};
+};
+
+const callClaude = async (messages, systemPrompt) => {
+  const key = getAiKey();
+  if(!key) throw new Error('NO_KEY');
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},
+    body: JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1024,system:systemPrompt,messages})
+  });
+  if(!res.ok){ const err=await res.json().catch(()=>({})); throw new Error(err?.error?.message||'API error '+res.status); }
+  const data = await res.json();
+  return data.content?.map(c=>c.text||'').join('') || '';
+};
+
+const formatAiText = text => text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>').replace(/^[-•] (.+)/gm,'• $1');
+
+const renderAI = b => {
+  const key = getAiKey();
+  if(!key) return renderAiKeyGate();
+  return '<div style="margin-bottom:12px"><div style="font-size:18px;font-weight:900;background:linear-gradient(135deg,var(--brand2),#a78bfa,var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px">&#10022; Nexora AI</div><div style="font-size:11px;color:var(--text3)">Your intelligent business advisor &mdash; powered by Claude</div></div>'
+  +'<div class="ai-mode-row">'
+  +[['chat','&#128172; Ask Anything'],['alerts','&#128276; Reorder Alerts'],['pricing','&#128161; Smart Pricing'],['forecast','&#128200; Forecast'],['invoice','&#128248; Scan Invoice'],['whatsapp','&#128242; Daily Report']].map(([m,l])=>'<button class="ai-mode-btn'+(aiMode===m?' active':'')+'" data-ai-mode="'+m+'">'+l+'</button>').join('')
+  +'</div><div id="ai-panel">'+renderAiPanel(b)+'</div>';
+};
+
+const renderAiKeyGate = () => '<div class="ai-key-gate"><div class="ai-key-gate-icon">&#129302;</div><div class="ai-key-gate-title">Activate Nexora AI</div><div class="ai-key-gate-sub">Enter your Anthropic API key to unlock the AI assistant, smart alerts, pricing suggestions, invoice scanning, and WhatsApp reports.<br><br>Get a free key at <strong>console.anthropic.com</strong></div><input id="ai-key-input" type="password" placeholder="sk-ant-..." style="margin-bottom:10px;text-align:center"><button class="btn btn-primary btn-block" id="ai-key-save-btn">Activate AI &rarr;</button><div style="font-size:10px;color:var(--text3);margin-top:12px">Your key is stored only on this device. Never shared.</div></div>';
+
+const renderAiPanel = b => {
+  if(aiMode==='chat') return renderAiChat();
+  if(aiMode==='alerts') return renderAiAlerts();
+  if(aiMode==='pricing') return renderAiPricing();
+  if(aiMode==='forecast') return renderAiForecast();
+  if(aiMode==='invoice') return renderAiInvoice();
+  if(aiMode==='whatsapp') return renderAiWhatsapp();
+  return '';
+};
+
+const renderAiChat = () => {
+  const chips=['Which product made most profit?','What is my total revenue?','Which items are running low?','Give me a business summary','What should I reorder next?'];
+  const bubbles=aiChat.length===0
+    ?'<div class="ai-msg ai"><div class="ai-avatar bot">&#10022;</div><div class="ai-bubble">Hello! I am your Nexora AI assistant. I have full access to your business data &mdash; stock, sales, profits, and products. Ask me anything!</div></div>'
+    :aiChat.map(m=>'<div class="ai-msg '+(m.role==='user'?'user':'ai')+'"><div class="ai-avatar '+(m.role==='user'?'usr':'bot')+'">'+(m.role==='user'?'&#128100;':'&#10022;')+'</div><div class="ai-bubble">'+(m.role==='assistant'?formatAiText(S(m.content)):S(m.content))+'</div></div>').join('');
+  const typing=aiLoading?'<div class="ai-msg ai"><div class="ai-avatar bot">&#10022;</div><div class="ai-bubble"><div class="ai-typing"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div></div></div>':'';
+  const clear=aiChat.length>0?'<button class="btn btn-ghost btn-block" id="ai-clear-btn" style="margin-top:8px;font-size:11px">Clear conversation</button>':'';
+  return '<div class="ai-chip-row">'+chips.map(q=>'<button class="ai-chip" data-ai-chip="'+S(q)+'">'+S(q)+'</button>').join('')+'</div>'
+    +'<div class="ai-chat-wrap" id="ai-chat-wrap">'+bubbles+typing+'</div>'
+    +'<div class="ai-input-row"><input id="ai-chat-input" type="text" placeholder="Ask anything about your business..."'+(aiLoading?' disabled':'')+'>'
+    +'<button class="btn btn-primary" id="ai-send-btn"'+(aiLoading?' disabled':'')+'>Send</button></div>'+clear;
+};
+
+const renderAiAlerts = () => '<div class="card"><div class="card-title">&#128276; Smart Reorder Alerts</div><div class="section-sub">AI analyses your sales speed vs remaining stock and tells you exactly what to reorder and when.</div><button class="btn btn-primary btn-block" id="ai-run-alerts-btn">Analyse Stock Now &rarr;</button></div><div id="ai-alerts-result"></div>';
+
+const renderAiPricing = () => '<div class="card"><div class="card-title">&#128161; AI Pricing Suggestions</div><div class="section-sub">AI looks at your cost prices and past margins to suggest the best selling price for each product.</div><div class="form-group"><label>Target Profit Margin %</label><input id="ai-margin-target" type="number" value="35" min="1" max="200"></div><button class="btn btn-primary btn-block" id="ai-run-pricing-btn">Generate Pricing &rarr;</button></div><div id="ai-pricing-result"></div>';
+
+const renderAiForecast = () => '<div class="card"><div class="card-title">&#128200; Demand Forecast</div><div class="section-sub">AI studies your past sales patterns and tells you which products will sell the most next month and which to import more of.</div><button class="btn btn-primary btn-block" id="ai-run-forecast-btn">Generate Forecast &rarr;</button></div><div id="ai-forecast-result"></div>';
+
+const renderAiInvoice = () => '<div class="card"><div class="card-title">&#128248; Scan Supplier Invoice</div><div class="section-sub">Take a photo of your supplier packing list or invoice. AI reads it and lists the products automatically.</div><div style="border:2px dashed var(--border2);border-radius:var(--radius);padding:24px;text-align:center;margin-bottom:12px;cursor:pointer" id="invoice-drop-zone"><div style="font-size:36px;margin-bottom:8px">&#128196;</div><div style="font-size:13px;color:var(--text2);font-weight:600">Tap to choose invoice photo</div><div style="font-size:11px;color:var(--text3);margin-top:4px">JPG, PNG, or screenshot</div></div><input type="file" id="ai-invoice-file" accept="image/*" style="display:none"><div id="ai-invoice-preview"></div><div id="ai-invoice-result"></div></div>';
+
+const renderAiWhatsapp = () => '<div class="card"><div class="card-title">&#128242; Daily WhatsApp Report</div><div class="section-sub">AI generates a clean, readable business summary you can copy and send via WhatsApp.</div><div class="form-group"><label>Report Period</label><select id="ai-report-period"><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option><option value="all">All Time</option></select></div><button class="btn btn-primary btn-block" id="ai-run-report-btn">Generate Report &rarr;</button></div><div id="ai-report-result"></div>';
+
+const scrollAiChat = () => setTimeout(()=>{ const el=document.getElementById('ai-chat-wrap'); if(el)el.scrollTop=el.scrollHeight; },80);
+
+const aiSendChat = async () => {
+  const b=biz(); if(!b||aiLoading)return;
+  const input=document.getElementById('ai-chat-input');
+  const msg=input?.value?.trim(); if(!msg)return;
+  input.value=''; aiLoading=true;
+  aiChat.push({role:'user',content:msg});
+  render(); scrollAiChat();
+  try{
+    const ctx=buildBizContext(b);
+    const system='You are Nexora AI, a business assistant embedded in Nexora POS used by traders in East Africa.\n\nBusiness data:\n'+JSON.stringify(ctx,null,2)+'\n\nGuidelines:\n- Answer in simple, friendly language. Avoid jargon.\n- Format numbers with commas and include currency ('+( b.currency||'UGX')+').\n- Be specific, direct, and use the actual data in your answers.\n- Keep responses concise unless detailed analysis is asked.\n- Give actionable business advice when relevant.';
+    const reply=await callClaude(aiChat.map(m=>({role:m.role,content:m.content})),system);
+    aiChat.push({role:'assistant',content:reply});
+  }catch(e){
+    aiChat.push({role:'assistant',content:e.message==='NO_KEY'?'No API key found. Go to the AI tab and enter your key.':'Error: '+e.message});
+  }
+  aiLoading=false; render(); scrollAiChat();
+};
+
+const aiRunAlerts = async () => {
+  const b=biz(); if(!b)return;
+  const el=document.getElementById('ai-alerts-result');
+  if(el)el.innerHTML='<div class="ai-scanning"><div class="ai-scan-ring"></div>Analysing your stock and sales velocity...</div>';
+  try{
+    const ctx=buildBizContext(b);
+    const system='You are a stock management AI. Analyse the data and generate smart reorder alerts. Respond ONLY in JSON with no markdown.\nReturn: {"alerts":[{"product":"name","status":"urgent|soon|ok","remaining":N,"daysLeft":N,"reorderQty":N,"reason":"short explanation"}],"summary":"1-2 sentence overview"}';
+    const reply=await callClaude([{role:'user',content:'Business data:\n'+JSON.stringify(ctx)}],system);
+    const data=JSON.parse(reply.replace(/```json|```/g,'').trim());
+    if(el) el.innerHTML='<div class="card" style="margin-top:0"><div class="card-title">&#128202; Summary</div><div style="font-size:13px;color:var(--text2);line-height:1.6">'+S(data.summary)+'</div></div>'
+      +(data.alerts||[]).map(a=>'<div class="ai-alert" style="'+(a.status==='urgent'?'border-color:var(--red-border);background:var(--red-bg)':a.status==='ok'?'border-color:var(--green-border);background:var(--green-bg)':'')+'">'
+        +'<div class="ai-alert-title" style="'+(a.status==='urgent'?'color:var(--red)':a.status==='ok'?'color:var(--green)':'')+'">'+(a.status==='urgent'?'Urgent':a.status==='soon'?'Reorder Soon':'Good')+' &mdash; '+S(a.product)+'</div>'
+        +'<div class="ai-alert-text">'+fmt(a.remaining)+' CTNs remaining &middot; ~'+a.daysLeft+' days left &middot; Suggest <strong>'+fmt(a.reorderQty)+' CTNs</strong><br>'+S(a.reason)+'</div></div>').join('');
+  }catch(e){ if(el)el.innerHTML='<div class="warn-box">'+( e.message==='NO_KEY'?'Add your API key first.':S(e.message))+'</div>'; }
+};
+
+const aiRunPricing = async () => {
+  const b=biz(); if(!b)return;
+  const el=document.getElementById('ai-pricing-result');
+  const target=parseInt(document.getElementById('ai-margin-target')?.value)||35;
+  if(el)el.innerHTML='<div class="ai-scanning"><div class="ai-scan-ring"></div>Calculating optimal prices for '+target+'% margin...</div>';
+  try{
+    const ctx=buildBizContext(b);
+    const system='You are a pricing strategy AI. The owner wants a '+target+'% profit margin. Respond ONLY in JSON, no markdown.\nReturn: {"suggestions":[{"product":"name","currentCost":N,"currentSell":N,"currentMargin":N,"suggestedSell":N,"suggestedMargin":N,"reasoning":"short"}],"advice":"2-3 sentence overall advice"}';
+    const reply=await callClaude([{role:'user',content:'Target margin: '+target+'%\nData:\n'+JSON.stringify(ctx)}],system);
+    const data=JSON.parse(reply.replace(/```json|```/g,'').trim());
+    if(el) el.innerHTML='<div class="card" style="margin-top:0"><div class="card-title">&#128161; Pricing Strategy</div><div style="font-size:13px;color:var(--text2);line-height:1.6">'+S(data.advice)+'</div></div>'
+      +(data.suggestions||[]).map(s=>{const diff=s.suggestedSell-s.currentSell,up=diff>0,same=diff===0;
+        return '<div class="ai-insight"><div class="ai-insight-label">'+S(s.product)+'</div>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;margin-bottom:8px">'
+        +'<div style="background:var(--bg);padding:8px;border-radius:8px"><div style="color:var(--text3);font-size:10px;margin-bottom:2px">CURRENT SELL</div><div style="font-weight:700">'+fmtC(s.currentSell)+'</div><div style="font-size:10px;color:var(--text3)">'+s.currentMargin+'% margin</div></div>'
+        +'<div style="background:var(--brand-glow);padding:8px;border-radius:8px;border:1px solid var(--brand)"><div style="color:var(--brand2);font-size:10px;margin-bottom:2px">SUGGESTED</div><div style="font-weight:700;color:var(--brand2)">'+fmtC(s.suggestedSell)+'</div><div style="font-size:10px;color:var(--brand2)">'+s.suggestedMargin+'% margin</div></div></div>'
+        +'<div style="font-size:11px;color:'+(up?'var(--green)':same?'var(--text3)':'var(--amber)')+'">'+( up?'Up by '+fmtC(diff):same?'Keep current price':'Down by '+fmtC(Math.abs(diff)))+'</div>'
+        +'<div style="font-size:11px;color:var(--text3);margin-top:4px">'+S(s.reasoning)+'</div></div>';
+      }).join('');
+  }catch(e){ if(el)el.innerHTML='<div class="warn-box">'+(e.message==='NO_KEY'?'Add your API key first.':S(e.message))+'</div>'; }
+};
+
+const aiRunForecast = async () => {
+  const b=biz(); if(!b)return;
+  const el=document.getElementById('ai-forecast-result');
+  if(el)el.innerHTML='<div class="ai-scanning"><div class="ai-scan-ring"></div>Forecasting demand from your sales patterns...</div>';
+  try{
+    const ctx=buildBizContext(b);
+    const system='You are a demand forecasting AI for a trading business. Respond ONLY in JSON, no markdown.\nReturn: {"forecasts":[{"product":"name","trend":"up|stable|down","confidence":"high|medium|low","expectedSalesNextMonth":N,"importRecommendationCtns":N,"notes":"short reasoning"}],"outlook":"2-3 sentences","topOpportunity":"best product to focus on and why"}';
+    const reply=await callClaude([{role:'user',content:'Forecast data:\n'+JSON.stringify(ctx)}],system);
+    const data=JSON.parse(reply.replace(/```json|```/g,'').trim());
+    if(el) el.innerHTML='<div class="dark-panel"><div class="dp-label">Business Outlook</div><div style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:10px">'+S(data.outlook)+'</div><div class="dp-label">Top Opportunity</div><div style="font-size:13px;color:var(--gold);line-height:1.6">&#11088; '+S(data.topOpportunity)+'</div></div>'
+      +(data.forecasts||[]).map(f=>'<div class="ai-insight"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div class="ai-insight-label">'+S(f.product)+'</div><span style="font-size:11px;font-weight:700;color:'+(f.trend==='up'?'var(--green)':f.trend==='down'?'var(--red)':'var(--text3)')+'">'+( f.trend==='up'?'&#8679; Growing':f.trend==='down'?'&#8681; Declining':'&#8680; Stable')+'</span></div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;font-size:11px">'
+      +'<div style="text-align:center;background:var(--bg);padding:6px;border-radius:6px"><div style="color:var(--text3);font-size:9px;margin-bottom:2px">EXPECTED SALES</div><div style="font-weight:700">'+fmt(f.expectedSalesNextMonth)+' CTN</div></div>'
+      +'<div style="text-align:center;background:var(--brand-glow);padding:6px;border-radius:6px;border:1px solid var(--brand)"><div style="color:var(--brand2);font-size:9px;margin-bottom:2px">IMPORT REC.</div><div style="font-weight:700;color:var(--brand2)">'+fmt(f.importRecommendationCtns)+' CTN</div></div>'
+      +'<div style="text-align:center;background:var(--bg);padding:6px;border-radius:6px"><div style="color:var(--text3);font-size:9px;margin-bottom:2px">CONFIDENCE</div><div style="font-weight:700;color:'+(f.confidence==='high'?'var(--green)':f.confidence==='low'?'var(--amber)':'var(--text)')+'">'+f.confidence+'</div></div></div>'
+      +'<div style="font-size:11px;color:var(--text3)">'+S(f.notes)+'</div></div>').join('');
+  }catch(e){ if(el)el.innerHTML='<div class="warn-box">'+(e.message==='NO_KEY'?'Add your API key first.':S(e.message))+'</div>'; }
+};
+
+const aiScanInvoice = async file => {
+  const preview=document.getElementById('ai-invoice-preview');
+  const result=document.getElementById('ai-invoice-result');
+  if(preview){ const url=URL.createObjectURL(file); preview.innerHTML='<img src="'+url+'" style="width:100%;border-radius:8px;margin-bottom:10px;border:1px solid var(--border);" onload="URL.revokeObjectURL(this.src)">'; }
+  if(result)result.innerHTML='<div class="ai-scanning"><div class="ai-scan-ring"></div>Reading invoice &mdash; extracting products...</div>';
+  try{
+    const base64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=e=>res(e.target.result.split(',')[1]); r.onerror=()=>rej(new Error('Read failed')); r.readAsDataURL(file); });
+    const key=getAiKey(); if(!key)throw new Error('NO_KEY');
+    const apiRes=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1024,
+        system:'You are reading a supplier invoice or packing list. Extract all products. Respond ONLY in JSON, no markdown.\nReturn: {"products":[{"name":"product name","artNo":"art number or empty","ctns":N,"pcsPerCtn":N,"totalUSD":N}],"invoiceTotal":N,"supplier":"supplier name or unknown","notes":"any important notes or empty string"}',
+        messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:file.type||'image/jpeg',data:base64}},{type:'text',text:'Read this supplier invoice and extract all product details.'}]}]})
+    });
+    if(!apiRes.ok)throw new Error('API error '+apiRes.status);
+    const data=await apiRes.json();
+    const text=data.content?.map(c=>c.text||'').join('')||'';
+    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+    const products=parsed.products||[];
+    if(result){
+      const prodRows=products.map(p=>'<div class="list-row"><div class="row-main"><div class="row-name">'+S(p.name)+'</div><div class="row-sub">'+(p.artNo?S(p.artNo)+' &middot; ':'')+p.ctns+' CTN &middot; '+p.pcsPerCtn+' pcs/CTN'+(p.totalUSD?' &middot; $'+p.totalUSD:'')+'</div></div></div>').join('');
+      const importBtn='<button class="btn btn-primary btn-block" id="ai-import-invoice-btn" style="margin-top:12px">Import These Products &rarr;</button>';
+      result.innerHTML='<div class="card" style="margin-top:0"><div class="card-title">&#9989; Invoice Read &mdash; '+products.length+' Products Found</div>'
+        +(parsed.supplier&&parsed.supplier!=='unknown'?'<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Supplier: <strong>'+S(parsed.supplier)+'</strong></div>':'')
+        +(parsed.invoiceTotal?'<div style="font-size:12px;color:var(--text2);margin-bottom:12px">Invoice Total: <strong>$'+parsed.invoiceTotal+'</strong></div>':'')
+        +prodRows+importBtn+(parsed.notes?'<div class="info-box" style="margin-top:10px">'+S(parsed.notes)+'</div>':'')+'</div>';
+      window._invoiceProducts=products;
+    }
+  }catch(e){
+    if(result)result.innerHTML='<div class="warn-box">'+(e.message==='NO_KEY'?'Add your API key first.':S(e.message))+'</div>';
+  }
+};
+
+const aiImportFromInvoice = () => {
+  const products=window._invoiceProducts||[]; if(!products.length)return;
+  const b=biz(); if(!b)return;
+  const toAdd=products.map(p=>({id:uid(),name:p.name||'Unknown',artNo:p.artNo||'',ctns:parseInt(p.ctns)||0,pcsPerCtn:parseInt(p.pcsPerCtn)||1,totalUSD:parseFloat(p.totalUSD)||0,sellPrice:0,costPrice:0}));
+  updateBiz(bz=>({...bz,products:recalcAll([...bz.products,...toAdd],bz.expenses)}));
+  flash(toAdd.length+' products imported from invoice'); setTab('settings');
+};
+
+const aiRunReport = async () => {
+  const b=biz(); if(!b)return;
+  const el=document.getElementById('ai-report-result');
+  const period=document.getElementById('ai-report-period')?.value||'today';
+  if(el)el.innerHTML='<div class="ai-scanning"><div class="ai-scan-ring"></div>Preparing your '+period+' report...</div>';
+  try{
+    const now=new Date(), todayStr=today();
+    const weekAgo=new Date(now-7*864e5).toISOString().split('T')[0];
+    const monthAgo=new Date(now-30*864e5).toISOString().split('T')[0];
+    const allSales=b.sales||[];
+    const filtered=period==='today'?allSales.filter(s=>s.date===todayStr):period==='week'?allSales.filter(s=>s.date>=weekAgo):period==='month'?allSales.filter(s=>s.date>=monthAgo):allSales;
+    const ctx={...buildBizContext(b),reportPeriod:period,periodRevenue:filtered.reduce((a,s)=>a+(s.revenue||0),0),periodProfit:filtered.reduce((a,s)=>a+(s.profit||0),0),periodTransactions:filtered.length,recentSalesForPeriod:filtered.slice(-15)};
+    const system='You are generating a WhatsApp business report for a small business owner. Write it in a friendly, clear way that is easy to read on a phone. Use emojis sparingly. Keep it under 300 words. Format it as plain text (use CAPS for headings, no asterisks). Start with a greeting.';
+    const reply=await callClaude([{role:'user',content:'Generate a '+period+' business report:\n'+JSON.stringify(ctx)}],system);
+    window._aiReportText=reply;
+    if(el) el.innerHTML='<div class="card" style="margin-top:0"><div class="card-title">&#128242; Your Report</div>'
+      +'<div style="background:var(--bg);border-radius:10px;padding:14px;font-size:13px;line-height:1.7;color:var(--text2);white-space:pre-wrap;border:1px solid var(--border);font-family:monospace" id="ai-report-text">'+S(reply)+'</div>'
+      +'<div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" id="ai-copy-report-btn">&#128203; Copy</button><button class="btn btn-outline" id="ai-wa-share-btn">&#128242; WhatsApp</button></div></div>';
+  }catch(e){ if(el)el.innerHTML='<div class="warn-box">'+(e.message==='NO_KEY'?'Add your API key first.':S(e.message))+'</div>'; }
+};
+
+const copyReport = () => {
+  const text=window._aiReportText||'';
+  if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=>flash('Copied to clipboard')); }
+  else{ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); flash('Copied'); }
+};
+const shareViaWhatsApp = () => window.open('https://wa.me/?text='+encodeURIComponent(window._aiReportText||''),'_blank');
+
+// STARTUP
+// ════════════════════════════════════════════════════
+const init = () => {
+  if(!window.XLSX) console.warn('XLSX library not loaded. Excel import disabled.');
+  if(state.businesses.length===0){ showSetupForm(); }
+  else if(state.activeBizId && state.businesses.find(b=>b.id===state.activeBizId)){ showPinForm(); }
+  else { state.activeBizId=state.businesses[0].id; showPinForm(); }
+};
+
+const showSetupForm = () => {
+  document.getElementById('splash-title').textContent = 'Welcome to Nexora POS';
+  document.getElementById('splash-sub').textContent = 'Create your first business profile.';
+  document.getElementById('setup-form').style.display = 'block';
+  document.getElementById('pin-form').style.display = 'none';
+  document.getElementById('splash').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+};
+
+const showPinForm = () => {
+  const b = biz();
+  document.getElementById('splash-title').textContent = 'Access Business';
+  document.getElementById('splash-sub').textContent = '';
+  document.getElementById('setup-form').style.display = 'none';
+  document.getElementById('pin-form').style.display = 'block';
+  document.getElementById('pin-biz-name').textContent = b?.name || '';
+  document.getElementById('splash').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  state.pinInput = ''; updatePinDots();
+};
+
+const showApp = () => {
+  document.getElementById('splash').style.display = 'none';
+  const app = document.getElementById('app');
+  app.style.display = 'flex';
+  const b = biz();
+  document.getElementById('sb-biz-name').textContent = b?.name || '';
+  document.getElementById('tb-biz-name').textContent = b?.name || '';
+  document.getElementById('sb-nav').innerHTML = TABS.map(t=>`<button class="sb-item${state.tab===t.id?' active':''}" data-tab="${t.id}"><span class="sb-icon">${t.icon}</span>${t.label}</button>`).join('');
+  document.getElementById('bottom-nav').innerHTML = TABS.map(t=>`<button class="nav-btn${state.tab===t.id?' active':''}" data-tab="${t.id}"><span class="nav-icon">${t.icon}</span>${t.label}</button>`).join('');
+  updateStatusStrip();
+  render();
+};
+
+// ════════════════════════════════════════════════════
+// BUSINESS SETUP
+// ════════════════════════════════════════════════════
+const createBiz = async () => {
+  const name = document.getElementById('setup-name').value.trim();
+  const pin = document.getElementById('setup-pin').value.trim();
+  const currency = document.getElementById('setup-currency').value || 'UGX';
+  if(!name) return showAlert('Please enter a business name.');
+  if(!/^\d{4}$/.test(pin)) return showAlert('PIN must be exactly 4 digits (numbers only).');
+  const btn = document.getElementById('create-biz-btn');
+  btn.textContent = 'Setting up...'; btn.disabled = true;
+  const hashedPin = await hashPin(pin);
+  const b = {
+    id:uid(), name, pin:hashedPin, currency, products:[], sales:[], consignments:[], createdAt:today(),
+    expenses:[
+      {id:uid(),key:'exchangeRate',label:'USD → '+currency+' Rate',amount:3700},
+      {id:uid(),key:'transport',label:'Transport',amount:15000000},
+      {id:uid(),key:'labour',label:'Labour',amount:1200000},
+      {id:uid(),key:'rent',label:'Rent / Warehouse',amount:5000000},
+      {id:uid(),key:'tax',label:'Tax / Customs',amount:70000000},
+      {id:uid(),key:'commission',label:'Commission',amount:2000000},
+    ]
+  };
+  state.businesses.push(b);
+  state.activeBizId = b.id;
+  save();
+  btn.textContent = 'Create Business →'; btn.disabled = false;
+  showApp();
+};
+
+// ════════════════════════════════════════════════════
+// PIN
+// ════════════════════════════════════════════════════
+const updatePinDots = () => { for(let i=0;i<4;i++){ const d=document.getElementById('pd'+i); if(d)d.className='pin-dot'+(i<state.pinInput.length?' on':''); } };
+const pinPress = async v => {
+  if(state.pinInput.length>=4) return;
+  state.pinInput += v; updatePinDots();
+  if(state.pinInput.length===4){
+    const b=biz();
+    const hashed = await hashPin(state.pinInput);
+    if(hashed===(b?.pin||'')){
+      setTimeout(showApp,120);
+    } else {
+      document.getElementById('pin-err').textContent='Wrong PIN — try again';
+      setTimeout(()=>{ state.pinInput=''; updatePinDots(); document.getElementById('pin-err').textContent=''; },700);
+    }
+  }
+};
+const pinDel = () => { state.pinInput=state.pinInput.slice(0,-1); updatePinDots(); };
+const doLock = () => { state.pinInput=''; showPinForm(); };
+
+// ════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════
+const renderDashboard = b => {
+  const sales=b.sales||[], prods=b.products||[];
+  const rev=sales.reduce((a,s)=>a+(s.revenue||0),0);
+  const gProfit=sales.reduce((a,s)=>a+Math.max(0,s.profit||0),0);
+  const gLoss=sales.reduce((a,s)=>a+Math.max(0,-(s.profit||0)),0);
+  const stockRows=prods.map(p=>({...p,...getStock(p,b)}));
+  const low=stockRows.filter(p=>p.status==='LOW').length, out=stockRows.filter(p=>p.status==='OUT').length;
+  const missing=prods.filter(p=>!p.sellPrice).length;
+  const recent=sales.slice().reverse().slice(0,5);
+  return `
+  <div class="ops-grid">
+    <button class="ops-btn" data-nav="sales"><div class="ops-ico">🧾</div><div class="ops-title">Wholesale</div><div class="ops-sub">Record CTN sales</div></button>
+    <button class="ops-btn" data-nav="retail"><div class="ops-ico">🏪</div><div class="ops-title">Retail / Shop</div><div class="ops-sub">Pieces & consignments</div></button>
+    <button class="ops-btn" data-nav="pricelist"><div class="ops-ico">💰</div><div class="ops-title">Prices</div><div class="ops-sub">${missing} missing prices</div></button>
+    <button class="ops-btn" data-nav="stock"><div class="ops-ico">📦</div><div class="ops-title">Stock</div><div class="ops-sub">${low+out} need attention</div></button>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Revenue</div><div class="kpi-value" style="color:var(--gold)">${fmtC(rev)}</div></div>
+    <div class="kpi"><div class="kpi-label">Profit</div><div class="kpi-value" style="color:var(--green)">${fmtC(gProfit)}</div></div>
+    <div class="kpi"><div class="kpi-label">Loss</div><div class="kpi-value" style="color:var(--red)">${fmtC(gLoss)}</div></div>
+    <div class="kpi"><div class="kpi-label">Transactions</div><div class="kpi-value">${sales.length}</div></div>
+  </div>
+  <div class="insight-grid">
+    <div class="insight-card ${missing?'warn':''}"><div class="insight-label">Pricing Work</div><div class="insight-value">${missing}</div><div class="insight-note">Products missing sell price</div></div>
+    <div class="insight-card ${low?'warn':''}"><div class="insight-label">Low Stock</div><div class="insight-value">${low}</div><div class="insight-note">Products at 1–2 CTNs</div></div>
+    <div class="insight-card ${out?'danger':''}"><div class="insight-label">Out of Stock</div><div class="insight-value">${out}</div><div class="insight-note">Products unavailable now</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔍 Product Search</div>
+    <div class="ac-wrap">
+      <input id="dash-search" type="text" placeholder="Type product name...">
+      <div class="ac-drop" id="dash-ac"></div>
+    </div>
+    <div id="dash-result"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🕒 Recent Activity</div>
+    ${recent.length===0?`<div class="empty"><span class="empty-icon">📭</span>No sales yet</div>`:
+    recent.map(s=>`<div class="list-row"><div class="row-main"><div class="row-name">${S(s.productName)}</div><div class="row-sub">${fmtD(s.date)} · ${s.type==='retail'?(s.pieces+' pcs'):(s.ctns+' CTN')} · ${S(s.client||s.notes||'—')}</div></div><div class="row-right"><div class="row-val">${fmtC(s.revenue)}</div><div class="row-profit" style="color:${(s.profit||0)>=0?'var(--green)':'var(--red)'}">${(s.profit||0)>=0?'+':'-'}${fmtC(Math.abs(s.profit||0))}</div></div></div>`).join('')}
+  </div>`;
+};
+
+const dashSearch = () => {
+  const b=biz();if(!b)return;
+  const txt=document.getElementById('dash-search')?.value.toLowerCase().trim();
+  const drop=document.getElementById('dash-ac');if(!drop)return;
+  const matches=txt?(b.products||[]).filter(p=>p.name.toLowerCase().includes(txt)):(b.products||[]);
+  if(!matches.length){drop.className='ac-drop';return;}
+  drop.innerHTML=matches.map(p=>`<div class="ac-item" data-pick="${S(p.id)}">${S(p.name)}</div>`).join('');
+  drop.className='ac-drop open';
+};
+const dashPick = id => {
+  const b=biz();if(!b)return;
+  const p=b.products.find(x=>x.id===id);if(!p)return;
+  const el=document.getElementById('dash-search');if(el)el.value=p.name;
+  document.getElementById('dash-ac').className='ac-drop';
+  const st=getStock(p,b);
+  const ps=b.sales.filter(s=>s.productId===id);
+  const rev=ps.reduce((a,s)=>a+(s.revenue||0),0), profit=ps.reduce((a,s)=>a+(s.profit||0),0);
+  document.getElementById('dash-result').innerHTML=`<div style="margin-top:12px"><div style="font-weight:800;font-size:14px;color:var(--text);margin-bottom:10px">${S(p.name)}</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+    ${[['Art No',S(p.artNo||'—')],['Total CTNs',fmt(p.ctns)],['Pcs / CTN',fmt(p.pcsPerCtn)+' pcs'],['Total Pcs',fmt((p.ctns||0)*(p.pcsPerCtn||0))],
+       ['Cost / CTN',fmtC(p.costPrice)],['Sell / CTN',fmtC(p.sellPrice)],
+       ['CTNs Sold',fmt(st.sold)],['Revenue',fmtC(rev)],
+       ['Profit',fmtC(profit)],['Remaining',fmt(st.remaining)+' CTN / '+fmt(st.remainingPcs)+' pcs']
+    ].map(([l,v])=>`<div style="background:var(--surface2);padding:8px 10px;border-radius:8px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-bottom:2px;text-transform:uppercase;font-weight:600">${l}</div><div style="font-size:13px;font-weight:700">${v}</div></div>`).join('')}
+  </div><div style="margin-top:8px">${badge(st.status)}</div></div>`;
+};
+
+// ════════════════════════════════════════════════════
+// PRICE LIST
+// ════════════════════════════════════════════════════
+const renderPriceList = b => {
+  const prods=b.products||[], sales=b.sales||[], exp=b.expenses||[];
+  if(!prods.length) return `<div class="empty"><span class="empty-icon">💰</span>No products yet.<br>Go to Settings to import or add products.</div>`;
+  const rate=getRate(exp), epc=getEPC(exp,prods);
+  const rows=prods.map(p=>{
+    const ctns=parseInt(p.ctns)||0, ppc=parseInt(p.pcsPerCtn)||1;
+    const totalUGX=Math.round((p.totalUSD||0)*rate), cost=p.costPrice||0, sell=p.sellPrice||0;
+    const totalCost=ctns*cost, expRev=ctns*sell, expProfit=expRev-totalCost;
+    const margin=expRev>0?+((expProfit/expRev)*100).toFixed(1):0;
+    const st=getStock(p,b);
+    const actRev=sales.filter(s=>s.productId===p.id).reduce((a,s)=>a+(s.revenue||0),0);
+    return{...p,ctns,ppc,totalUGX,cost,sell,totalCost,expRev,expProfit,margin,st,actRev};
+  });
+  const tot={
+    ctns:rows.reduce((a,r)=>a+r.ctns,0), usd:rows.reduce((a,r)=>a+(r.totalUSD||0),0),
+    ugx:rows.reduce((a,r)=>a+r.totalUGX,0), cost:rows.reduce((a,r)=>a+r.totalCost,0),
+    rev:rows.reduce((a,r)=>a+r.expRev,0), profit:rows.reduce((a,r)=>a+Math.max(0,r.expProfit),0),
+    loss:rows.reduce((a,r)=>a+Math.max(0,-r.expProfit),0),
+    actRev:rows.reduce((a,r)=>a+r.actRev,0),
+  };
+  const net=tot.profit-tot.loss, margin=tot.rev>0?+((net/tot.rev)*100).toFixed(1):0;
+  const progress=tot.rev>0?Math.min(100,+(tot.actRev/tot.rev*100).toFixed(1)):0;
+  const missing=prods.filter(p=>!p.sellPrice).length;
+  return `
+  <div class="dark-panel">
+    <div class="dp-grid">
+      <div class="dp-item"><div class="dp-label">Landed Cost</div><div class="dp-value" id="pl-cost">${fmtC(tot.cost)}</div></div>
+      <div class="dp-item"><div class="dp-label">Exp. Revenue</div><div class="dp-value" id="pl-rev">${fmtC(tot.rev)}</div></div>
+      <div class="dp-item"><div class="dp-label">Exp. Profit</div><div class="dp-value" style="color:var(--green)" id="pl-profit">${fmtC(tot.profit)}</div></div>
+      <div class="dp-item"><div class="dp-label">Exp. Loss</div><div class="dp-value" style="color:var(--red)" id="pl-loss">${fmtC(tot.loss)}</div></div>
+      <div class="dp-item"><div class="dp-label">Net Margin</div><div class="dp-value" id="pl-margin">${margin}%</div></div>
+    </div>
+    <div style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.4);margin-bottom:5px">
+        <span id="pl-collected">Collected: ${fmtC(tot.actRev)}</span>
+        <span id="pl-remaining">Remaining: ${fmtC(tot.rev-tot.actRev)}</span>
+      </div>
+      <div class="rbar"><div class="rbar-fill" id="pl-progress" style="width:${progress}%"></div></div>
+    </div>
+    ${missing>0?`<div style="color:var(--amber);font-size:11px;font-weight:600;margin-top:10px" id="pl-missing">⚠ ${missing} products missing sell price</div>`:'<div id="pl-missing"></div>'}
+  </div>
+  <div class="card">
+    <div class="card-title">💰 Price List</div>
+    ${rows.map(p=>`
+    <div class="list-row" style="gap:10px;flex-wrap:wrap">
+      <div class="row-main">
+        <div class="row-name">${S(p.name)}</div>
+        <div class="row-sub">${S(p.artNo||'—')} · ${p.ctns} CTN · ${p.ppc} pcs/CTN · Cost: ${fmtC(p.cost)} · ${badge(p.st.status)}</div>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap">
+          <div style="font-size:11px;color:var(--text3)">Sell price / CTN:</div>
+          <input type="number" value="${p.sell||''}" placeholder="Enter price" data-sell-id="${S(p.id)}" style="width:140px;font-size:12px;padding:5px 8px">
+          <span style="font-size:11px;color:var(--text3)">Margin: <strong style="color:${p.margin>=0?'var(--green)':'var(--red)'}">${p.margin}%</strong></span>
+        </div>
+      </div>
+      <div class="row-right" style="min-width:90px">
+        <div class="row-val">${fmtC(p.sell*p.ctns)}</div>
+        <div class="row-profit" style="color:${p.expProfit>=0?'var(--green)':'var(--red)'}">exp ${p.expProfit>=0?'+':''}${fmtC(p.expProfit)}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">${fmt(p.st.remaining)} CTN left</div>
+      </div>
+    </div>`).join('')}
+  </div>`;
+};
+
+const updateSellPrice = (id, val) => {
+  updateBiz(b=>({...b, products:b.products.map(p=>p.id===id?{...p,sellPrice:parseInt(val)||0}:p)}));
+  refreshPriceListSummary();
+};
+
+const refreshPriceListSummary = () => {
+  const b=biz();if(!b)return;
+  const prods=b.products||[], sales=b.sales||[], exp=b.expenses||[];
+  const rows=prods.map(p=>{ const ctns=parseInt(p.ctns)||0,sell=p.sellPrice||0,cost=p.costPrice||0; const tc=ctns*cost,er=ctns*sell,ep=er-tc; const ar=sales.filter(s=>s.productId===p.id).reduce((a,s)=>a+(s.revenue||0),0); return{ctns,tc,er,ep,ar,sell}; });
+  const tot={cost:rows.reduce((a,r)=>a+r.tc,0),rev:rows.reduce((a,r)=>a+r.er,0),profit:rows.reduce((a,r)=>a+Math.max(0,r.ep),0),loss:rows.reduce((a,r)=>a+Math.max(0,-r.ep),0),actRev:rows.reduce((a,r)=>a+r.ar,0)};
+  const net=tot.profit-tot.loss, margin=tot.rev>0?+((net/tot.rev)*100).toFixed(1):0;
+  const progress=tot.rev>0?Math.min(100,+(tot.actRev/tot.rev*100).toFixed(1)):0;
+  const missing=prods.filter(p=>!p.sellPrice).length;
+  const g=id=>document.getElementById(id);
+  if(g('pl-cost'))g('pl-cost').textContent=fmtC(tot.cost);
+  if(g('pl-rev'))g('pl-rev').textContent=fmtC(tot.rev);
+  if(g('pl-profit'))g('pl-profit').textContent=fmtC(tot.profit);
+  if(g('pl-loss'))g('pl-loss').textContent=fmtC(tot.loss);
+  if(g('pl-margin'))g('pl-margin').textContent=margin+'%';
+  if(g('pl-progress'))g('pl-progress').style.width=progress+'%';
+  if(g('pl-collected'))g('pl-collected').textContent='Collected: '+fmtC(tot.actRev);
+  if(g('pl-remaining'))g('pl-remaining').textContent='Remaining: '+fmtC(tot.rev-tot.actRev);
+  if(g('pl-missing'))g('pl-missing').textContent=missing>0?'⚠ '+missing+' products missing sell price':'';
+};
+
+// ════════════════════════════════════════════════════
+// WHOLESALE SALES
+// ════════════════════════════════════════════════════
+const renderSales = b => {
+  const sales=(b.sales||[]).filter(s=>s.type==='wholesale');
+  return `
+  <div class="card">
+    <div class="card-title">🧾 Record Wholesale Sale</div>
+    <div class="form-group"><label>Date</label><input id="sale-date" type="date" value="${today()}"></div>
+    <div class="form-group"><label>Product</label>
+      <div class="ac-wrap">
+        <input id="sale-prod-text" type="text" placeholder="Search product name...">
+        <input type="hidden" id="sale-prod-id">
+        <div class="ac-drop" id="sale-ac"></div>
+      </div>
+    </div>
+    <div id="sale-cost-box"></div>
+    <div class="form-group"><label>Client (optional)</label><input id="sale-client" type="text" placeholder="e.g. Jane's Shop" maxlength="80"></div>
+    <div style="display:flex;gap:8px">
+      <div class="form-group" style="flex:1"><label>CTNs Sold</label><input id="sale-ctns" type="number" min="1" placeholder="0"></div>
+      <div class="form-group" style="flex:1"><label>Sell Price / CTN</label><input id="sale-price" type="number" placeholder="price"></div>
+    </div>
+    <div id="sale-preview"></div>
+    <button class="btn btn-primary btn-block" id="do-sale-btn" style="margin-top:8px">Record Sale →</button>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Wholesale History (${sales.length})</div>
+    ${sales.length===0?`<div class="empty"><span class="empty-icon">🧾</span>No wholesale sales yet</div>`
+    :sales.slice().reverse().map(s=>`
+    <div class="list-row">
+      <div class="row-main">
+        <div class="row-name">${S(s.productName)}</div>
+        <div class="row-sub">${S(s.invoiceNo)} · ${fmtD(s.date)} · ${S(s.client||'—')} · ${s.ctns} CTN</div>
+      </div>
+      <div class="row-right">
+        <div class="row-val">${fmtC(s.revenue)}</div>
+        <div class="row-profit" style="color:${(s.profit||0)>=0?'var(--green)':'var(--red)'}">+${fmtC(s.profit)}</div>
+        <button class="btn btn-sm" style="margin-top:4px;font-size:10px" data-receipt-id="${S(s.id)}">🧾 Receipt</button>
+      </div>
+    </div>`).join('')}
+  </div>`;
+};
+
+const saleAcInput = () => {
+  const b=biz();if(!b)return;
+  const txt=document.getElementById('sale-prod-text').value.toLowerCase().trim();
+  const drop=document.getElementById('sale-ac');
+  const matches=txt?(b.products||[]).filter(p=>p.name.toLowerCase().includes(txt)):(b.products||[]);
+  if(!matches.length){drop.className='ac-drop';return;}
+  drop.innerHTML=matches.map(p=>`<div class="ac-item" data-sale-pick="${S(p.id)}" data-sale-name="${S(p.name)}">${S(p.name)}</div>`).join('');
+  drop.className='ac-drop open';
+};
+const salePick = (id, name) => {
+  document.getElementById('sale-prod-id').value=id;
+  document.getElementById('sale-prod-text').value=name;
+  document.getElementById('sale-ac').className='ac-drop';
+  const b=biz();if(!b)return;
+  const p=b.products.find(x=>x.id===id);if(!p)return;
+  if(p.sellPrice)document.getElementById('sale-price').value=p.sellPrice;
+  const exp=b.expenses||[],prods=b.products||[],rate=getRate(exp),epc=getEPC(exp,prods);
+  const ugx=Math.round((p.totalUSD||0)*rate),upc=p.ctns>0?Math.round(ugx/p.ctns):0,st=getStock(p,b);
+  document.getElementById('sale-cost-box').innerHTML=`<div class="cost-box" style="margin-bottom:10px">
+    <div style="font-weight:700;color:var(--brand2);margin-bottom:8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Cost Breakdown</div>
+    <div class="cost-row"><span>Total USD</span><strong>$${(p.totalUSD||0).toFixed(2)}</strong></div>
+    <div class="cost-row"><span>× Rate</span><strong>${fmtC(ugx)}</strong></div>
+    <div class="cost-row"><span>÷ ${p.ctns} CTNs</span><strong>${fmtC(upc)} / CTN</strong></div>
+    <div class="cost-row"><span>+ Expense / CTN</span><strong>${fmtC(epc)}</strong></div>
+    <div class="cost-total"><span>Cost / CTN</span><span style="color:var(--brand2)">${fmtC(p.costPrice||0)}</span></div>
+    <div style="font-size:10px;color:var(--text3);margin-top:6px">Available: ${fmt(st.remaining)} CTN · ${p.pcsPerCtn} pcs/CTN</div>
+  </div>`;
+  salePreview();
+};
+const salePreview = () => {
+  const b=biz();if(!b)return;
+  const id=document.getElementById('sale-prod-id').value;
+  const c=parseInt(document.getElementById('sale-ctns')?.value)||0;
+  const pr=parseInt(document.getElementById('sale-price')?.value)||0;
+  if(!id||!c||!pr){document.getElementById('sale-preview').innerHTML='';return;}
+  const p=b.products.find(x=>x.id===id);if(!p)return;
+  const st=getStock(p,b),rev=c*pr,profit=c*(pr-(p.costPrice||0)),margin=pr>0?+((profit/rev)*100).toFixed(1):0,blocked=c>st.remaining;
+  document.getElementById('sale-preview').innerHTML=`<div class="${blocked?'warn-box':'preview-box'}">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>Cost: <strong>${fmtC(c*(p.costPrice||0))}</strong></span><span>Revenue: <strong>${fmtC(rev)}</strong></span></div>
+    <div style="display:flex;justify-content:space-between"><span>Profit: <strong style="color:${profit>=0?'var(--green)':'var(--red)'}">${fmtC(profit)}</strong></span><span>Margin: <strong>${margin}%</strong></span></div>
+    ${blocked?`<div style="margin-top:6px;font-weight:700">⚠ Only ${fmt(st.remaining)} CTN available.</div>`:''}</div>`;
+};
+const doSale = () => {
+  const b=biz();if(!b)return;
+  const pid=document.getElementById('sale-prod-id').value;
+  const cN=parseInt(document.getElementById('sale-ctns').value)||0;
+  const pN=parseInt(document.getElementById('sale-price').value)||0;
+  if(!pid)return flash('Select a product','err');
+  if(!cN)return flash('Enter CTNs sold','err');
+  if(cN<=0)return flash('Quantity must be greater than 0','err');
+  if(!pN)return flash('Enter selling price','err');
+  const p=b.products.find(x=>x.id===pid);if(!p)return;
+  const st=getStock(p,b);
+  if(cN>st.remaining)return flash(`Only ${fmt(st.remaining)} CTN available for ${p.name}`,'err');
+  const date=document.getElementById('sale-date').value||today();
+  const client=document.getElementById('sale-client').value.trim()||'—';
+  const wsales=(b.sales||[]).filter(s=>s.type==='wholesale');
+  const newSale={id:uid(),type:'wholesale',date,invoiceNo:'INV-'+String(wsales.length+1).padStart(3,'0'),productId:pid,productName:p.name,artNo:p.artNo||'',client,ctns:cN,sellPrice:pN,costPrice:p.costPrice||0,totalUSD:p.totalUSD||0,revenue:cN*pN,profit:cN*(pN-(p.costPrice||0)),margin:pN>0?+((pN-(p.costPrice||0))/pN*100).toFixed(1):0};
+  updateBiz(bz=>({...bz,sales:[...bz.sales||[],newSale]}));
+  flash('Sale recorded ✓');
+  render();
+  setTimeout(()=>showReceipt(newSale), 300);
+};
+
+// ════════════════════════════════════════════════════
+// RETAIL
+// ════════════════════════════════════════════════════
+const renderRetail = b => {
+  const rm=state.retailMode, rtSales=(b.sales||[]).filter(s=>s.type==='retail'), cons=b.consignments||[];
+  const consVal=cons.reduce((a,c)=>{const p=b.products.find(x=>x.id===c.productId);return a+(c.ctns*(p?.sellPrice||0));},0);
+  return `
+  <div class="filter-row">
+    <button class="filter-btn${rm==='sale'?' active':''}" data-retail-mode="sale">Daily Sales</button>
+    <button class="filter-btn${rm==='consignment'?' active':''}" data-retail-mode="consignment">Send to Shop</button>
+  </div>
+  <div class="card">
+    <div class="card-title">${rm==='sale'?'🏪 Retail Sale (pieces)':'📦 Send CTNs to Shop'}</div>
+    <div class="form-group"><label>Date</label><input id="rt-date" type="date" value="${today()}"></div>
+    <div class="form-group"><label>Product</label>
+      <div class="ac-wrap">
+        <input id="rt-prod-text" type="text" placeholder="Type product name...">
+        <input type="hidden" id="rt-prod-id">
+        <div class="ac-drop" id="rt-ac"></div>
+      </div>
+      <div id="rt-conv-info"></div>
+    </div>
+    ${rm==='sale'?`
+    <div style="display:flex;gap:8px">
+      <div class="form-group" style="flex:1"><label>Pieces Sold</label><input id="rt-pieces" type="number" min="1" placeholder="0"></div>
+      <div class="form-group" style="flex:1"><label>Price / Piece</label><input id="rt-price" type="number" placeholder="auto"></div>
+    </div>
+    <div id="rt-preview"></div>
+    <button class="btn btn-primary btn-block" id="do-retail-btn" style="margin-top:8px">Record Sale →</button>
+    `:`
+    <div class="info-box">CTNs sent to shop reduce stock but are not counted as revenue until month-end reconciliation.</div>
+    <div class="form-group"><label>CTNs to Shop</label><input id="rt-ctns" type="number" min="1" placeholder="0"></div>
+    <div class="form-group"><label>Notes (optional)</label><input id="rt-notes" type="text" placeholder="e.g. Downtown shop" maxlength="80"></div>
+    <button class="btn btn-primary btn-block" id="do-consign-btn">Send to Shop →</button>`}
+  </div>
+  ${rm==='sale'?`
+  <div class="card">
+    <div class="card-title">📋 Retail History (${rtSales.length})</div>
+    ${rtSales.length===0?`<div class="empty"><span class="empty-icon">🏪</span>No retail sales yet</div>`
+    :rtSales.slice().reverse().map(s=>`<div class="list-row"><div class="row-main"><div class="row-name">${S(s.productName)}</div><div class="row-sub">${fmtD(s.date)} · ${s.pieces} pcs${s.notes?' · '+S(s.notes):''}</div></div><div class="row-right"><div class="row-val">${fmtC(s.revenue)}</div><div class="row-profit" style="color:var(--green)">+${fmtC(s.profit)}</div><button class="btn btn-sm" style="margin-top:4px;font-size:10px" data-receipt-id="${S(s.id)}">🧾</button></div></div>`).join('')}
+  </div>`:`
+  <div class="card">
+    <div class="card-title">📋 Consignment Log (${cons.length}) <span style="font-size:10px;color:var(--amber);font-weight:400">${fmtC(consVal)} outstanding</span></div>
+    ${cons.length===0?`<div class="empty"><span class="empty-icon">📦</span>No consignments yet</div>`
+    :cons.slice().reverse().map(c=>`<div class="list-row"><div class="row-main"><div class="row-name">${S(c.productName)}</div><div class="row-sub">${fmtD(c.date)}${c.notes?' · '+S(c.notes):''}</div></div><div class="row-right"><div class="row-val">${c.ctns} CTN</div><span class="badge badge-shop">At shop</span></div></div>`).join('')}
+  </div>`}`;
+};
+
+const rtAcInput = () => {
+  const b=biz();if(!b)return;
+  const txt=document.getElementById('rt-prod-text').value.toLowerCase().trim();
+  const drop=document.getElementById('rt-ac');
+  const matches=txt?(b.products||[]).filter(p=>p.name.toLowerCase().includes(txt)):(b.products||[]);
+  if(!matches.length){drop.className='ac-drop';return;}
+  drop.innerHTML=matches.map(p=>`<div class="ac-item" data-rt-pick="${S(p.id)}" data-rt-name="${S(p.name)}">${S(p.name)}</div>`).join('');
+  drop.className='ac-drop open';
+};
+const rtPick = (id,name) => {
+  document.getElementById('rt-prod-id').value=id;
+  document.getElementById('rt-prod-text').value=name;
+  document.getElementById('rt-ac').className='ac-drop';
+  const b=biz();if(!b)return;
+  const p=b.products.find(x=>x.id===id);if(!p)return;
+  const st=getStock(p,b),ppc=parseInt(p.pcsPerCtn)||1;
+  document.getElementById('rt-conv-info').innerHTML=`<div class="section-sub" style="margin-top:4px">1 CTN = ${ppc} pcs · Available: ${fmt(st.remaining)} CTN / ${fmt(st.remainingPcs)} pcs</div>`;
+  const rtp=document.getElementById('rt-price');
+  if(state.retailMode==='sale'&&p.sellPrice&&p.pcsPerCtn&&rtp) rtp.value=Math.round(p.sellPrice/ppc);
+  rtPreview();
+};
+const rtPreview = () => {
+  const pc=parseInt(document.getElementById('rt-pieces')?.value)||0,pr=parseInt(document.getElementById('rt-price')?.value)||0;
+  const b=biz(),pid=document.getElementById('rt-prod-id')?.value;
+  const p=b?.products?.find(x=>x.id===pid),st=p?getStock(p,b):null,blocked=!!(st&&pc>st.remainingPcs);
+  const el=document.getElementById('rt-preview');
+  if(el)el.innerHTML=pc&&pr?`<div class="${blocked?'warn-box':'preview-box'}">Revenue: <strong>${fmtC(pc*pr)}</strong>${blocked?`<div style="margin-top:6px;font-weight:700">Only ${fmt(st.remainingPcs)} pcs available.</div>`:''}</div>`:'';
+};
+const doRetail = () => {
+  const b=biz();if(!b)return;
+  const pid=document.getElementById('rt-prod-id').value,pc=parseInt(document.getElementById('rt-pieces')?.value)||0,pr=parseInt(document.getElementById('rt-price')?.value)||0;
+  if(!pid)return flash('Select a product','err');
+  if(pc<=0)return flash('Enter pieces sold','err');
+  if(!pr)return flash('Enter price per piece','err');
+  const p=b.products.find(x=>x.id===pid);if(!p)return;
+  const st=getStock(p,b);
+  if(pc>st.remainingPcs)return flash(`Only ${fmt(st.remainingPcs)} pcs available for ${p.name}`,'err');
+  const cpp=p.pcsPerCtn>0?Math.round((p.costPrice||0)/p.pcsPerCtn):0,date=document.getElementById('rt-date').value||today(),notes=document.getElementById('rt-notes')?.value||'';
+  const newSale={id:uid(),type:'retail',date,productId:pid,productName:p.name,pieces:pc,pricePerPc:pr,costPerPc:cpp,revenue:pc*pr,profit:pc*(pr-cpp),notes};
+  updateBiz(bz=>({...bz,sales:[...bz.sales||[],newSale]}));
+  flash('Retail sale recorded ✓');render();
+  setTimeout(()=>showReceipt(newSale),300);
+};
+const doConsign = () => {
+  const b=biz();if(!b)return;
+  const pid=document.getElementById('rt-prod-id').value,ctns=parseInt(document.getElementById('rt-ctns')?.value)||0,notes=document.getElementById('rt-notes')?.value||'';
+  if(!pid)return flash('Select a product','err');
+  if(ctns<=0)return flash('Enter CTNs','err');
+  const p=b.products.find(x=>x.id===pid);if(!p)return;
+  const st=getStock(p,b);
+  if(ctns>st.remaining)return flash(`Only ${fmt(st.remaining)} CTN available for ${p.name}`,'err');
+  const date=document.getElementById('rt-date').value||today();
+  updateBiz(bz=>({...bz,consignments:[...bz.consignments||[],{id:uid(),date,productId:pid,productName:p.name,artNo:p.artNo||'',ctns,notes,status:'OUT'}]}));
+  flash('Sent to shop ✓');render();
+};
+
+// ════════════════════════════════════════════════════
+// STOCK
+// ════════════════════════════════════════════════════
+const renderStock = b => {
+  const prods=b.products||[];
+  const sorted=prods.map(p=>({...p,...getStock(p,b)})).sort((a,b)=>a.remaining-b.remaining);
+  const filtered=state.stockFilter==='all'?sorted:sorted.filter(p=>p.status===state.stockFilter);
+  const ok=sorted.filter(p=>p.status==='OK').length,low=sorted.filter(p=>p.status==='LOW').length,out=sorted.filter(p=>p.status==='OUT').length;
+  return `
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Total Products</div><div class="kpi-value">${prods.length}</div></div>
+    <div class="kpi"><div class="kpi-label">In Stock</div><div class="kpi-value" style="color:var(--green)">${ok}</div></div>
+    <div class="kpi"><div class="kpi-label">Low (≤2 CTN)</div><div class="kpi-value" style="color:var(--amber)">${low}</div></div>
+    <div class="kpi"><div class="kpi-label">Out of Stock</div><div class="kpi-value" style="color:var(--red)">${out}</div></div>
+  </div>
+  <div class="filter-row">
+    ${[['all','All'],['OK','In Stock'],['LOW','Low'],['OUT','Out']].map(([v,l])=>`<button class="filter-btn${state.stockFilter===v?' active':''}" data-stock-filter="${v}">${l}</button>`).join('')}
+  </div>
+  <div class="card">
+    <div class="card-title">📦 Inventory · Lowest first</div>
+    ${filtered.length===0?`<div class="empty"><span class="empty-icon">✅</span>No products match this filter</div>`
+    :filtered.map(p=>`<div class="list-row"><div class="row-main"><div class="row-name">${S(p.name)}</div><div class="row-sub">${S(p.artNo||'—')} · ${p.pcsPerCtn} pcs/CTN · Sold: ${p.sold} CTN · Shop: ${p.consigned} CTN</div></div><div class="row-right"><div class="row-val">${fmt(p.remaining)} CTN</div><div style="font-size:10px;color:var(--text3);margin:2px 0">${fmt(p.remainingPcs)} pcs</div>${badge(p.status)}</div></div>`).join('')}
+  </div>`;
+};
+
+// ════════════════════════════════════════════════════
+// REPORTS
+// ════════════════════════════════════════════════════
+const renderReports = b => {
+  const sales=b.sales||[],prods=b.products||[];
+  const wh=sales.filter(s=>s.type==='wholesale'),rt=sales.filter(s=>s.type==='retail');
+  const rev=sales.reduce((a,s)=>a+(s.revenue||0),0),profit=sales.reduce((a,s)=>a+(s.profit||0),0);
+  const margin=rev>0?(profit/rev*100).toFixed(1):0;
+  const byProd=prods.map(p=>{ const ps=sales.filter(s=>s.productId===p.id); return{name:p.name,rev:ps.reduce((a,s)=>a+(s.revenue||0),0),profit:ps.reduce((a,s)=>a+(s.profit||0),0),remaining:getStock(p,b).remaining}; }).filter(p=>p.rev>0).sort((a,x)=>x.rev-a.rev);
+  const maxR=byProd[0]?.rev||1;
+  const slow=prods.filter(p=>!sales.some(s=>s.productId===p.id)&&getStock(p,b).remaining>0);
+  return `
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Total Revenue</div><div class="kpi-value" style="color:var(--gold)">${fmtC(rev)}</div></div>
+    <div class="kpi"><div class="kpi-label">Total Profit</div><div class="kpi-value" style="color:var(--green)">${fmtC(profit)}</div></div>
+    <div class="kpi"><div class="kpi-label">Gross Margin</div><div class="kpi-value">${margin}%</div></div>
+    <div class="kpi"><div class="kpi-label">Transactions</div><div class="kpi-value">${sales.length}</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 Sales by Channel</div>
+    ${[['Wholesale (CTNs)',wh.reduce((a,s)=>a+(s.revenue||0),0)],['Retail (pieces)',rt.reduce((a,s)=>a+(s.revenue||0),0)]].map(([l,v])=>`
+    <div class="rbar-wrap"><div class="rbar-label"><span>${l}</span><span style="color:var(--gold)">${fmtC(v)}</span></div><div class="rbar"><div class="rbar-fill" style="width:${rev>0?(v/rev*100)+'%':'0%'}"></div></div></div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="card-title">🏆 Top Products by Revenue</div>
+    ${byProd.length===0?`<div class="empty"><span class="empty-icon">📊</span>No sales yet</div>`
+    :byProd.map((p,i)=>`<div class="rbar-wrap"><div class="rbar-label"><span style="font-weight:${i<3?700:500};color:${i===0?'var(--gold)':i===1?'var(--text)':'var(--text2)'}">${i+1}. ${S(p.name)}</span><span style="color:var(--gold)">${fmtC(p.rev)}</span></div><div class="rbar"><div class="rbar-fill" style="width:${(p.rev/maxR*100).toFixed(1)}%"></div></div><div style="font-size:11px;color:var(--text3);margin:3px 0 6px">Profit: ${fmtC(p.profit)} · Remaining: ${fmt(p.remaining)} CTN</div></div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="card-title">📉 Slow Movers (in stock, no sales)</div>
+    ${slow.length===0?`<div style="font-size:12px;color:var(--green);padding:8px 0">✓ All stocked products have sales</div>`
+    :slow.map(p=>{const st=getStock(p,b);return`<div class="list-row"><div class="row-main"><div class="row-name">${S(p.name)}</div><div class="row-sub">${S(p.artNo||'—')} · ${fmt(st.remaining)} CTN remaining</div></div>${badge('LOW')}</div>`;}).join('')}
+  </div>`;
+};
+
+// ════════════════════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════════════════════
+const renderSettings = b => {
+  const exp=b.expenses||[],prods=b.products||[],epc=getEPC(exp,prods);
+  const totalExp=(exp||[]).filter(e=>e.key!=='exchangeRate').reduce((s,e)=>s+(e.amount||0),0);
+  const totalCtns=prods.reduce((s,p)=>s+(parseInt(p.ctns)||0),0);
+  return `
+  <div class="card">
+    <div class="card-title">📥 Import from Excel</div>
+    <div class="section-sub">Upload your supplier packing list or price list. Cost prices auto-calculate from your expenses below.</div>
+    ${!window.XLSX?`<div class="warn-box">Excel import is disabled. Open Nexora POS in a browser with internet access to load the XLSX library.</div>`:''}
+    <input type="file" accept=".xlsx,.xls" id="import-file-input" style="font-size:12px;padding:4px;width:100%;color:var(--text2)">
+    ${prods.length>0?`<div style="margin-top:8px;font-size:12px;color:var(--green);font-weight:600">✓ ${prods.length} products loaded · ${fmt(totalCtns)} CTNs</div>`:''}
+  </div>
+  <div class="card">
+    <div class="card-title">💾 Data Backup</div>
+    <div class="section-sub">Download a backup before switching devices or clearing your browser. Keep it somewhere safe.</div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="export-btn">⬇ Download Backup</button>
+      <label class="btn btn-outline" style="text-align:center;margin:0;text-transform:none;font-size:13px;cursor:pointer">⬆ Restore Backup<input type="file" accept=".json" id="import-data-input" style="display:none"></label>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">☁️ Cloud Sync</div>
+    <div class="section-sub">Connect a free Supabase project to sync your POS across multiple phones and laptops. Works offline when internet is off.</div>
+    <div class="form-group"><label>Supabase URL</label><input id="cloud-url" type="url" value="${S(state.cloud.url||'')}" placeholder="https://your-project.supabase.co"></div>
+    <div class="form-group"><label>Supabase Anon Key</label><input id="cloud-key" type="password" value="${S(state.cloud.anonKey||'')}" placeholder="paste anon public key"></div>
+    <div class="form-group"><label>System ID</label><input id="cloud-system" type="text" value="${S(state.cloud.systemId||'nexora-main')}" placeholder="nexora-main"></div>
+    <div class="form-group"><label>Staff Email</label><input id="cloud-email" type="email" value="${S(state.cloud.email||'')}" placeholder="staff@example.com"></div>
+    <div class="form-group"><label>Password <span style="font-size:10px;color:var(--amber)">(not saved — enter each session)</span></label><input id="cloud-password" type="password" placeholder="Supabase staff password"></div>
+    <div class="btn-row">
+      <button class="btn btn-outline" id="save-cloud-btn">Save Settings</button>
+      <button class="btn btn-outline" id="cloud-signin-btn">Sign In</button>
+      <button class="btn btn-outline" id="cloud-pull-btn">Pull Latest</button>
+      <button class="btn btn-primary" id="cloud-push-btn">Push Device</button>
+    </div>
+    <div class="section-sub" style="margin-top:10px">Last sync: ${state.cloud.lastSync?fmtD(state.cloud.lastSync):'Not synced yet'}</div>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="card-title" style="margin:0">📦 Products (${prods.length})</div>
+      <button class="btn btn-sm btn-primary" id="add-prod-btn">+ Add Product</button>
+    </div>
+    ${prods.length===0?`<div class="empty"><span class="empty-icon">📦</span>No products yet</div>`
+    :prods.map(p=>`<div class="list-row"><div class="row-main"><div class="row-name">${S(p.name)}</div><div class="row-sub">${S(p.artNo||'—')} · ${p.ctns} CTN · ${p.pcsPerCtn} pcs/CTN · Cost ${fmtC(p.costPrice)} · Sell ${fmtC(p.sellPrice)}</div></div><div style="display:flex;gap:4px;flex-shrink:0"><button class="btn btn-sm" data-edit-prod="${S(p.id)}">✏️</button><button class="btn btn-sm btn-danger" data-del-prod="${S(p.id)}">🗑</button></div></div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="card-title">🧮 Exchange Rate & Expenses</div>
+    <div class="section-sub">Changes instantly recalculate all product cost prices.</div>
+    ${exp.filter(e=>e.key==='exchangeRate').map(e=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+      <label style="flex:1;margin:0;font-weight:700;color:var(--text)">USD → ${cur()} Rate</label>
+      <input type="number" value="${e.amount}" data-exp-id="${S(e.id)}" style="width:130px;text-align:right">
+    </div>`).join('')}
+    ${exp.filter(e=>e.key!=='exchangeRate').map(e=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <label style="flex:1;margin:0;color:var(--text2)">${S(e.label)}</label>
+      <input type="number" value="${e.amount}" data-exp-id="${S(e.id)}" style="width:120px;text-align:right">
+      <button class="btn btn-sm btn-danger" data-del-exp="${S(e.id)}">✕</button>
+    </div>`).join('')}
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+      <div class="section-sub">Add new expense:</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <input id="new-exp-label" type="text" placeholder="Label (e.g. Insurance)" style="flex:1 1 140px;min-width:120px" maxlength="50">
+        <input id="new-exp-amt" type="number" placeholder="Amount" style="flex:1 1 120px;min-width:100px;text-align:right">
+        <button class="btn btn-sm btn-primary" id="add-exp-btn">+ Add</button>
+      </div>
+    </div>
+    <div style="background:var(--surface2);padding:10px 12px;border-radius:var(--radius-sm);font-size:12px;margin-top:12px;border:1px solid var(--border)">
+      Total: <strong>${fmtC(totalExp)}</strong> · CTNs: <strong>${fmt(totalCtns)}</strong> · Exp/CTN: <strong>${fmtC(epc)}</strong>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔐 Change PIN</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input id="pin-current" type="password" maxlength="4" placeholder="Current PIN" style="flex:1;min-width:100px">
+      <input id="pin-new1" type="password" maxlength="4" placeholder="New PIN" style="flex:1;min-width:100px">
+      <input id="pin-new2" type="password" maxlength="4" placeholder="Confirm PIN" style="flex:1;min-width:100px">
+    </div>
+    <button class="btn btn-outline btn-block" id="change-pin-btn" style="margin-top:8px">Update PIN</button>
+  </div>
+  <div class="card" style="border-color:var(--red-border)">
+    <div class="card-title" style="color:var(--red)">⚠️ Reset Period</div>
+    <div class="section-sub">Clears all sales and consignments. Products and expenses are kept.</div>
+    <button class="btn btn-danger btn-block" id="reset-btn">Reset Sales Data</button>
+  </div>
+  <div class="card">
+    <div class="card-title">🔓 Access</div>
+    <div class="btn-row">
+      <button class="btn btn-outline" id="lock-btn2">🔒 Lock / Log Out</button>
+      <button class="btn btn-outline" id="new-biz-btn">+ New Business</button>
+    </div>
+  </div>`;
+};
+
+// ════════════════════════════════════════════════════
+// EXPENSE ACTIONS
+// ════════════════════════════════════════════════════
+const updateExp = (id,val) => { updateBiz(b=>{ const ne=b.expenses.map(e=>e.id===id?{...e,amount:parseInt(val)||0}:e); return{...b,expenses:ne,products:recalcAll(b.products,ne)}; }); render(); };
+const removeExp = async id => { if(await showConfirm('Remove this expense? Cost prices will be recalculated.','Remove Expense')){ updateBiz(b=>{ const ne=b.expenses.filter(e=>e.id!==id); return{...b,expenses:ne,products:recalcAll(b.products,ne)}; }); flash('Expense removed'); render(); } };
+const addExp = () => {
+  const label=document.getElementById('new-exp-label')?.value.trim(),amt=document.getElementById('new-exp-amt')?.value;
+  if(!label||!amt)return flash('Enter label and amount','err');
+  updateBiz(b=>{ const ne=[...b.expenses,{id:uid(),key:'custom_'+Date.now(),label,amount:parseInt(amt)||0}]; return{...b,expenses:ne,products:recalcAll(b.products,ne)}; });
+  flash('Expense added'); render();
+};
+const doReset = async () => {
+  const b=biz();if(!b)return;
+  if(await showConfirm(`Reset ALL sales and consignments for "${b.name}"? Products and expenses are kept.`,'Reset Period')){
+    updateBiz(bz=>({...bz,sales:[],consignments:[]}));
+    flash('Reset complete — ready for new period'); render();
+  }
+};
+
+// ════════════════════════════════════════════════════
+// CHANGE PIN
+// ════════════════════════════════════════════════════
+const changePin = async () => {
+  const curr=document.getElementById('pin-current').value;
+  const n1=document.getElementById('pin-new1').value;
+  const n2=document.getElementById('pin-new2').value;
+  if(!/^\d{4}$/.test(curr)||!/^\d{4}$/.test(n1)||!/^\d{4}$/.test(n2)) return showAlert('All PINs must be 4 digits.');
+  if(n1!==n2) return showAlert('New PINs do not match. Please try again.');
+  const b=biz();
+  const hashedCurr=await hashPin(curr);
+  if(hashedCurr!==b.pin) return showAlert('Current PIN is incorrect.');
+  const hashedNew=await hashPin(n1);
+  updateBiz(bz=>({...bz,pin:hashedNew}));
+  flash('PIN changed successfully ✓');
+  ['pin-current','pin-new1','pin-new2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+};
+
+// ════════════════════════════════════════════════════
+// PRODUCT MODAL
+// ════════════════════════════════════════════════════
+const openAddProd = () => {
+  state.editingProdId=null;
+  document.getElementById('prod-modal-title').textContent='Add Product';
+  document.getElementById('pm-save-btn').textContent='Add Product →';
+  ['pm-name','pm-art','pm-ctns','pm-ppc','pm-usd','pm-sell'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  updateProdCost();
+  document.getElementById('prod-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('pm-name')?.focus(),100);
+};
+const openEditProd = id => {
+  const b=biz();if(!b)return;
+  const p=b.products.find(x=>x.id===id);if(!p)return;
+  state.editingProdId=id;
+  document.getElementById('prod-modal-title').textContent='Edit Product';
+  document.getElementById('pm-save-btn').textContent='Save Changes →';
+  document.getElementById('pm-name').value=p.name||'';
+  document.getElementById('pm-art').value=p.artNo||'';
+  document.getElementById('pm-ctns').value=p.ctns||'';
+  document.getElementById('pm-ppc').value=p.pcsPerCtn||'';
+  document.getElementById('pm-usd').value=p.totalUSD||'';
+  document.getElementById('pm-sell').value=p.sellPrice||'';
+  updateProdCost();
+  document.getElementById('prod-modal').classList.add('open');
+};
+const closeProdModal = () => document.getElementById('prod-modal').classList.remove('open');
+const updateProdCost = () => {
+  const b=biz();if(!b)return;
+  const usd=parseFloat(document.getElementById('pm-usd')?.value)||0,ctns=parseInt(document.getElementById('pm-ctns')?.value)||0;
+  const exp=b.expenses||[],prods=b.products||[],rate=getRate(exp),epc=getEPC(exp,prods);
+  const ugx=Math.round(usd*rate),upc=ctns>0?Math.round(ugx/ctns):0,cost=upc+epc;
+  const g=id=>document.getElementById(id);
+  if(g('pm-ugx'))g('pm-ugx').textContent=fmtC(ugx);
+  if(g('pm-upc'))g('pm-upc').textContent=fmtC(upc)+' / CTN';
+  if(g('pm-epc'))g('pm-epc').textContent=fmtC(epc);
+  if(g('pm-cost'))g('pm-cost').textContent=fmtC(cost);
+};
+const saveProd = () => {
+  const b=biz();if(!b)return;
+  const name=document.getElementById('pm-name').value.trim();
+  if(!name)return showAlert('Product name is required.');
+  const p={id:state.editingProdId||uid(),name,artNo:document.getElementById('pm-art').value.trim(),ctns:parseInt(document.getElementById('pm-ctns').value)||0,pcsPerCtn:parseInt(document.getElementById('pm-ppc').value)||1,totalUSD:parseFloat(document.getElementById('pm-usd').value)||0,sellPrice:parseInt(document.getElementById('pm-sell').value)||0,costPrice:0};
+  if(state.editingProdId){ updateBiz(bz=>({...bz,products:recalcAll(bz.products.map(x=>x.id===p.id?p:x),bz.expenses)})); flash('Product updated ✓'); }
+  else { updateBiz(bz=>({...bz,products:recalcAll([...bz.products,p],bz.expenses)})); flash('Product added ✓'); }
+  closeProdModal(); render();
+};
+const delProd = async id => {
+  if(await showConfirm('Delete this product? This cannot be undone.','Delete Product')){
+    updateBiz(b=>({...b,products:b.products.filter(p=>p.id!==id)}));
+    flash('Product deleted'); render();
+  }
+};
+
+// ════════════════════════════════════════════════════
+// EXCEL IMPORT
+// ════════════════════════════════════════════════════
+const importFile = ev => {
+  if(!window.XLSX) return flash('Excel library not loaded.','err');
+  const file=ev.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const sn=wb.SheetNames.includes('PRICE LIST')?'PRICE LIST':wb.SheetNames[0];
+      const data=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:''});
+      let hRow=-1,cm={};
+      for(let i=0;i<Math.min(15,data.length);i++){
+        const row=data[i].map(c=>String(c||'').trim().toUpperCase());
+        const hn=row.findIndex(c=>c.includes('NAME')||c.includes('DESCRIPTION'));
+        const hc=row.findIndex(c=>c==='CTN'||c==='CTNS'||c.includes('CARTON'));
+        if(hn>=0&&hc>=0){
+          hRow=i;
+          row.forEach((cell,idx)=>{
+            if(cell.includes('ART')||cell.includes('ITEM NO'))cm.artNo=idx;
+            if(cell.includes('NAME')||cell.includes('DESCRIPTION'))cm.name=idx;
+            if((cell==='CTN'||cell==='CTNS')&&!cell.includes('PCS'))cm.ctns=idx;
+            if(cell.includes('PCS')&&(cell.includes('CTN')||cell.includes('/')))cm.ppc=idx;
+            if(cell.includes('TOTAL')&&cell.includes('PCS'))cm.totalPcs=idx;
+            if((cell.includes('TOTAL')&&cell.includes('USD'))||(cell.includes('UNIT')&&cell.includes('USD')))cm.usd=idx;
+            if(cell.includes('SELL')&&cell.includes('PRICE'))cm.sell=idx;
+          });break;
+        }
+      }
+      if(hRow<0){hRow=5;cm={artNo:1,name:2,ctns:3,ppc:4,totalPcs:5,usd:6,sell:9};}
+      const parsed=[];
+      for(let i=hRow+1;i<data.length;i++){
+        const r=data[i];const name=String(r[cm.name]||'').trim();
+        if(!name)continue;
+        if(['TOTALS','TOTAL','PRODUCT NAME','(MANUAL)','PRODUCT','DESCRIPTION','DESCRIPTIONS'].includes(name.toUpperCase()))continue;
+        const ctns=parseInt(r[cm.ctns])||0,tp=parseInt(r[cm.totalPcs])||0;
+        let ppc=cm.ppc!=null?parseInt(r[cm.ppc])||0:0;
+        if(!ppc&&ctns>0&&tp>0)ppc=Math.round(tp/ctns);
+        if(!ppc)ppc=1;
+        const usd=parseFloat(r[cm.usd])||0,artNo=String(r[cm.artNo]||'').trim();
+        if(!ctns&&!artNo)continue;
+        parsed.push({id:uid(),artNo,name,ctns,pcsPerCtn:ppc,totalUSD:usd,sellPrice:parseInt(r[cm.sell])||0,costPrice:0});
+      }
+      if(parsed.length>0){
+        updateBiz(bz=>({...bz,products:recalcAll(parsed,bz.expenses)}));
+        flash(`${parsed.length} products imported ✓`); render();
+      } else flash('No products found — check file format','err');
+    }catch(e){ flash('Import failed: '+e.message,'err'); }
+    ev.target.value='';
+  };
+  reader.readAsBinaryString(file);
+};
+
+// ════════════════════════════════════════════════════
+// BACKUP & RESTORE
+// ════════════════════════════════════════════════════
+const exportData = () => {
+  const b=biz(),name=(b?.name||'nexora').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'nexora';
+  const blob=new Blob([JSON.stringify(appSnapshot(),null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url; a.download=`${name}-backup-${today()}.json`;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  flash('Backup downloaded ✓');
+};
+const importData = async ev => {
+  const file=ev.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      const businesses=Array.isArray(data.businesses)?data.businesses:null;
+      if(!businesses)throw new Error('Invalid backup file format');
+      if(await showConfirm('Restore this backup? Current data in this browser will be replaced.','Restore Backup')){
+        state.businesses=businesses;
+        state.activeBizId=data.activeBizId&&businesses.some(b=>b.id===data.activeBizId)?data.activeBizId:(businesses[0]?.id||null);
+        save(); flash('Backup restored ✓'); init();
+      }
+    }catch(err){ flash('Could not restore backup: '+err.message,'err'); }
+    ev.target.value='';
+  };
+  reader.readAsText(file);
+};
+
+// ════════════════════════════════════════════════════
+// CLOUD SYNC
+// ════════════════════════════════════════════════════
+let sbClient=null;
+const saveCloudSettings = () => {
+  state.cloud={...state.cloud,url:document.getElementById('cloud-url')?.value.trim()||'',anonKey:document.getElementById('cloud-key')?.value.trim()||'',systemId:document.getElementById('cloud-system')?.value.trim()||'nexora-main',email:document.getElementById('cloud-email')?.value.trim()||''};
+  sbClient=null; saveCloud(); updateStatusStrip(); flash('Cloud settings saved');
+};
+const loadSupabase = () => new Promise((resolve,reject)=>{
+  if(window.supabase?.createClient)return resolve(window.supabase);
+  const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+  s.onload=()=>window.supabase?.createClient?resolve(window.supabase):reject(new Error('Supabase unavailable'));
+  s.onerror=()=>reject(new Error('Could not load Supabase library'));
+  document.head.appendChild(s);
+});
+const cloudClient = async () => {
+  saveCloudSettings();
+  if(!state.cloud.url||!state.cloud.anonKey)throw new Error('Enter Supabase URL and anon key first');
+  if(sbClient)return sbClient;
+  const supa=await loadSupabase();
+  sbClient=supa.createClient(state.cloud.url,state.cloud.anonKey);
+  return sbClient;
+};
+const cloudSignIn = async () => {
+  try{ const client=await cloudClient(),email=state.cloud.email,password=document.getElementById('cloud-password')?.value||''; if(!email||!password)return flash('Enter staff email and password','err'); const{error}=await client.auth.signInWithPassword({email,password}); if(error)throw error; flash('Signed in to cloud ✓'); }
+  catch(err){flash(err.message||'Cloud sign in failed','err');}
+};
+const cloudRequireSession = async client => { const{data}=await client.auth.getSession(); if(!data.session)throw new Error('Sign in to cloud first'); };
+const cloudPush = async () => {
+  try{ const client=await cloudClient(); await cloudRequireSession(client); const now=new Date().toISOString(); const{error}=await client.from('pos_systems').upsert({id:state.cloud.systemId||'nexora-main',payload:appSnapshot(),updated_at:now}); if(error)throw error; state.cloud.lastSync=now; saveCloud(); flash('Cloud updated ✓'); render(); }
+  catch(err){flash(err.message||'Cloud push failed','err');}
+};
+const cloudPull = async () => {
+  try{
+    const client=await cloudClient(); await cloudRequireSession(client);
+    const{data,error}=await client.from('pos_systems').select('payload,updated_at').eq('id',state.cloud.systemId||'nexora-main').single();
+    if(error)throw error;
+    if(!data?.payload?.businesses)throw new Error('No POS data found in cloud');
+    if(await showConfirm('Pull latest cloud data? This will replace the data on this device.','Pull from Cloud')){
+      state.businesses=data.payload.businesses;
+      state.activeBizId=data.payload.activeBizId&&state.businesses.some(b=>b.id===data.payload.activeBizId)?data.payload.activeBizId:(state.businesses[0]?.id||null);
+      state.cloud.lastSync=data.updated_at||new Date().toISOString();
+      save(); saveCloud(); flash('Cloud data loaded ✓'); init();
+    }
+  }catch(err){flash(err.message||'Cloud pull failed','err');}
+};
+
+// ════════════════════════════════════════════════════
+// CALCULATOR
+// ════════════════════════════════════════════════════
+const showCalc = () => document.getElementById('calc-modal').classList.add('open');
+const hideCalc = () => document.getElementById('calc-modal').classList.remove('open');
+const cPress = v => { state.calcExpr+=v; document.getElementById('calc-expr').textContent=state.calcExpr; };
+const cDel = () => { state.calcExpr=state.calcExpr.slice(0,-1); document.getElementById('calc-expr').textContent=state.calcExpr; };
+const cClear = () => { state.calcExpr=''; document.getElementById('calc-expr').textContent=''; document.getElementById('calc-result').textContent='0'; };
+const cCalc = () => {
+  try{
+    if(!state.calcExpr)return;
+    const r=evalMath(state.calcExpr);
+    if(!isFinite(r))throw new Error('Not finite');
+    document.getElementById('calc-result').textContent=fmt(Math.round(r*100)/100);
+  }catch(e){ document.getElementById('calc-result').textContent='Error'; }
+};
+
+// ════════════════════════════════════════════════════
+// RECEIPT
+// ════════════════════════════════════════════════════
+const showReceipt = sale => {
+  const b=biz();
+  const isW=sale.type==='wholesale';
+  document.getElementById('receipt-content').innerHTML=`
+  <div style="font-family:'Courier New',Courier,monospace;max-width:300px;margin:0 auto">
+    <div style="text-align:center;padding-bottom:14px;border-bottom:2px dashed #ccc;margin-bottom:14px">
+      <div style="font-size:22px;font-weight:900;letter-spacing:4px;color:#0f1623">NEXORA POS</div>
+      <div style="font-size:13px;font-weight:700;color:#374151;margin-top:2px">${S(b?.name||'')}</div>
+    </div>
+    <div style="margin-bottom:12px;font-size:12px;color:#374151">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span>Receipt No:</span><strong>${S(isW?(sale.invoiceNo||'—'):(sale.id.slice(0,8).toUpperCase()))}</strong></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span>Date:</span><strong>${fmtD(sale.date)}</strong></div>
+      ${isW&&sale.client&&sale.client!=='—'?`<div style="display:flex;justify-content:space-between;margin-bottom:3px"><span>Client:</span><strong>${S(sale.client)}</strong></div>`:''}
+      <div style="display:flex;justify-content:space-between"><span>Type:</span><strong>${isW?'Wholesale':'Retail'}</strong></div>
+    </div>
+    <div style="border-top:1px dashed #ccc;border-bottom:1px dashed #ccc;padding:10px 0;margin-bottom:12px;font-size:12px">
+      <div style="font-weight:700;color:#0f1623;font-size:13px;margin-bottom:6px">${S(sale.productName)}</div>
+      ${sale.artNo?`<div style="color:#6b7280;margin-bottom:4px;font-size:11px">Art No: ${S(sale.artNo)}</div>`:''}
+      <div style="display:flex;justify-content:space-between">
+        <span>${isW?`${sale.ctns} CTN × ${cur()} ${fmt(sale.sellPrice)}`:`${sale.pieces} pcs × ${cur()} ${fmt(sale.pricePerPc)}`}</span>
+        <strong>${fmtC(sale.revenue)}</strong>
+      </div>
+    </div>
+    <div style="text-align:right;margin-bottom:14px">
+      <div style="font-size:11px;color:#6b7280;margin-bottom:2px">TOTAL AMOUNT</div>
+      <div style="font-size:22px;font-weight:900;color:#0f1623">${fmtC(sale.revenue)}</div>
+    </div>
+    <div style="text-align:center;font-size:10px;color:#9ca3af;padding-top:12px;border-top:1px dashed #ccc">
+      Thank you for your business!<br>Powered by Nexora POS
+    </div>
+  </div>`;
+  document.getElementById('receipt-modal').classList.add('open');
+};
+const hideReceipt = () => document.getElementById('receipt-modal').classList.remove('open');
+const printReceipt = () => window.print();
+
+// ════════════════════════════════════════════════════
+// EVENTS — all listeners initialized once
+// ════════════════════════════════════════════════════
+const initEvents = () => {
+  // === SPLASH ===
+  document.getElementById('create-biz-btn').addEventListener('click', createBiz);
+  document.getElementById('setup-pin').addEventListener('keydown', e=>{ if(e.key==='Enter')createBiz(); });
+  document.getElementById('setup-name').addEventListener('keydown', e=>{ if(e.key==='Enter')document.getElementById('setup-pin').focus(); });
+  document.getElementById('pin-del-btn').addEventListener('click', pinDel);
+  document.getElementById('pin-dots').closest('.splash-card').addEventListener('click', e=>{
+    const btn=e.target.closest('[data-pin]');
+    if(btn)pinPress(btn.dataset.pin);
+  });
+  document.addEventListener('keydown', e=>{
+    const pinVisible=document.getElementById('pin-form').style.display==='block'&&document.getElementById('splash').style.display!=='none';
+    if(pinVisible){ if(e.key>='0'&&e.key<='9')pinPress(e.key); else if(e.key==='Backspace'||e.key==='Delete')pinDel(); }
+  });
+
+  // === SIDEBAR / TOPBAR ===
+  document.getElementById('sb-calc-btn').addEventListener('click', showCalc);
+  document.getElementById('tb-calc-btn').addEventListener('click', showCalc);
+  document.getElementById('sb-lock-btn').addEventListener('click', doLock);
+
+  // === NAV DELEGATION (sidebar + bottom nav) ===
+  ['sb-nav','bottom-nav'].forEach(navId=>{
+    document.getElementById(navId).addEventListener('click', e=>{
+      const btn=e.target.closest('[data-tab]');
+      if(btn)setTab(btn.dataset.tab);
+    });
+  });
+
+  // === CONTENT DELEGATION ===
+  document.getElementById('content').addEventListener('click', e=>{
+    // Quick nav buttons (ops-grid)
+    const navBtn=e.target.closest('[data-nav]');
+    if(navBtn){setTab(navBtn.dataset.nav);return;}
+    // Dashboard product autocomplete
+    const pick=e.target.closest('[data-pick]');
+    if(pick){dashPick(pick.dataset.pick);return;}
+    // Sale autocomplete
+    const salePk=e.target.closest('[data-sale-pick]');
+    if(salePk){salePick(salePk.dataset.salePick,salePk.dataset.saleName);return;}
+    // Retail autocomplete
+    const rtPk=e.target.closest('[data-rt-pick]');
+    if(rtPk){rtPick(rtPk.dataset.rtPick,rtPk.dataset.rtName);return;}
+    // Retail mode toggle
+    const rtMode=e.target.closest('[data-retail-mode]');
+    if(rtMode){state.retailMode=rtMode.dataset.retailMode;render();return;}
+    // Stock filter
+    const sf=e.target.closest('[data-stock-filter]');
+    if(sf){state.stockFilter=sf.dataset.stockFilter;render();return;}
+    // Receipt button
+    const rBtn=e.target.closest('[data-receipt-id]');
+    if(rBtn){ const b=biz(); if(b){ const s=[...b.sales,...(b.consignments||[])].find(x=>x.id===rBtn.dataset.receiptId); if(s)showReceipt(s); } return; }
+    // Edit/delete product
+    const ep=e.target.closest('[data-edit-prod]');
+    if(ep){openEditProd(ep.dataset.editProd);return;}
+    const dp=e.target.closest('[data-del-prod]');
+    if(dp){delProd(dp.dataset.delProd);return;}
+    // Delete expense
+    const de=e.target.closest('[data-del-exp]');
+    if(de){removeExp(de.dataset.delExp);return;}
+    // Sale/Retail/Consign action buttons
+    if(e.target.id==='do-sale-btn')doSale();
+    if(e.target.id==='do-retail-btn')doRetail();
+    if(e.target.id==='do-consign-btn')doConsign();
+    if(e.target.id==='add-prod-btn')openAddProd();
+    if(e.target.id==='add-exp-btn')addExp();
+    if(e.target.id==='export-btn')exportData();
+    if(e.target.id==='reset-btn')doReset();
+    if(e.target.id==='lock-btn2')doLock();
+    if(e.target.id==='new-biz-btn'){showSetupForm();}
+    if(e.target.id==='change-pin-btn')changePin();
+    if(e.target.id==='save-cloud-btn')saveCloudSettings();
+    if(e.target.id==='cloud-signin-btn')cloudSignIn();
+    if(e.target.id==='cloud-pull-btn')cloudPull();
+    if(e.target.id==='cloud-push-btn')cloudPush();
+  });
+
+  // === CONTENT INPUT DELEGATION ===
+  document.getElementById('content').addEventListener('input', e=>{
+    // Dashboard search
+    if(e.target.id==='dash-search'){dashSearch();return;}
+    // Sale autocomplete
+    if(e.target.id==='sale-prod-text'){saleAcInput();return;}
+    if(e.target.id==='sale-ctns'||e.target.id==='sale-price'){salePreview();return;}
+    // Retail autocomplete
+    if(e.target.id==='rt-prod-text'){rtAcInput();return;}
+    if(e.target.id==='rt-pieces'||e.target.id==='rt-price'){rtPreview();return;}
+    // Price list sell price inline edit
+    const sellEl=e.target.closest('[data-sell-id]');
+    if(sellEl){updateSellPrice(sellEl.dataset.sellId,e.target.value);return;}
+    // Expense update
+    const expEl=e.target.closest('[data-exp-id]');
+    if(expEl){updateExp(expEl.dataset.expId,e.target.value);return;}
+    // Product modal cost preview
+    if(['pm-ctns','pm-ppc','pm-usd'].includes(e.target.id))updateProdCost();
+  });
+
+  // === CONTENT KEYDOWN DELEGATION ===
+  document.getElementById('content').addEventListener('keydown', e=>{
+    if(e.key==='Enter'){
+      if(e.target.id==='sale-client'||e.target.id==='sale-ctns'||e.target.id==='sale-price')doSale();
+      if(e.target.id==='rt-pieces'||e.target.id==='rt-price')doRetail();
+      if(e.target.id==='rt-ctns'||e.target.id==='rt-notes')doConsign();
+      if(e.target.id==='new-exp-label'||e.target.id==='new-exp-amt')addExp();
+      if(e.target.id==='sale-prod-text'){
+        const b=biz();if(!b)return;
+        const txt=e.target.value.toLowerCase().trim();
+        const match=(b.products||[]).filter(p=>p.name.toLowerCase().includes(txt));
+        if(match.length===1)salePick(match[0].id,match[0].name);
+        else doSale();
+      }
+      if(e.target.id==='rt-prod-text'){
+        const b=biz();if(!b)return;
+        const txt=e.target.value.toLowerCase().trim();
+        const match=(b.products||[]).filter(p=>p.name.toLowerCase().includes(txt));
+        if(match.length===1)rtPick(match[0].id,match[0].name);
+        else state.retailMode==='sale'?doRetail():doConsign();
+      }
+    }
+    if(e.key==='Escape') document.querySelectorAll('.ac-drop.open').forEach(d=>d.className='ac-drop');
+  });
+
+  // === FILE INPUTS ===
+  document.getElementById('content').addEventListener('change', e=>{
+    if(e.target.id==='import-file-input')importFile(e);
+    if(e.target.id==='import-data-input')importData(e);
+  });
+
+  // === MODALS ===
+  document.getElementById('prod-modal-close').addEventListener('click', closeProdModal);
+  document.getElementById('prod-modal').addEventListener('click', e=>{ if(e.target===document.getElementById('prod-modal'))closeProdModal(); });
+  document.getElementById('pm-save-btn').addEventListener('click', saveProd);
+  ['pm-name','pm-art','pm-ctns','pm-ppc','pm-usd','pm-sell'].forEach(id=>{
+    document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')saveProd();});
+  });
+  ['pm-ctns','pm-ppc','pm-usd'].forEach(id=>{
+    document.getElementById(id).addEventListener('input',updateProdCost);
+  });
+
+  // === CALCULATOR ===
+  document.getElementById('calc-close-btn').addEventListener('click', hideCalc);
+  document.getElementById('calc-modal').addEventListener('click', e=>{ if(e.target===document.getElementById('calc-modal'))hideCalc(); });
+  document.getElementById('calc-modal').addEventListener('click', e=>{
+    const btn=e.target.closest('[data-cv]');
+    if(btn){cPress(btn.dataset.cv);return;}
+    if(e.target.id==='calc-del')cDel();
+    if(e.target.id==='calc-clear')cClear();
+    if(e.target.id==='calc-eq')cCalc();
+  });
+
+  // === RECEIPT ===
+  document.getElementById('receipt-close-btn').addEventListener('click', hideReceipt);
+  document.getElementById('receipt-close-btn2').addEventListener('click', hideReceipt);
+  document.getElementById('receipt-print-btn').addEventListener('click', printReceipt);
+  document.getElementById('receipt-modal').addEventListener('click', e=>{ if(e.target===document.getElementById('receipt-modal'))hideReceipt(); });
+
+  // === CLOSE DROPDOWNS ON OUTSIDE CLICK ===
+  document.addEventListener('click', e=>{
+    document.querySelectorAll('.ac-drop.open').forEach(d=>{
+      if(!d.parentElement?.contains(e.target))d.className='ac-drop';
+    });
+  });
+
+
+  // === AI TAB EVENTS ===
+  document.getElementById('content').addEventListener('click', e => {
+    // AI mode switcher
+    const modeBtn = e.target.closest('[data-ai-mode]');
+    if(modeBtn){ aiMode=modeBtn.dataset.aiMode; render(); return; }
+    // Quick chip questions
+    const chip = e.target.closest('[data-ai-chip]');
+    if(chip){ const input=document.getElementById('ai-chat-input'); if(input){input.value=chip.dataset.aiChip; aiSendChat();} return; }
+    // Action buttons
+    if(e.target.id==='ai-key-save-btn'){ const k=document.getElementById('ai-key-input')?.value?.trim(); if(k){setAiKey(k);flash('AI activated');render();}else flash('Enter a valid API key','err'); return; }
+    if(e.target.id==='ai-send-btn') aiSendChat();
+    if(e.target.id==='ai-clear-btn'){ aiChat=[]; render(); }
+    if(e.target.id==='ai-run-alerts-btn') aiRunAlerts();
+    if(e.target.id==='ai-run-pricing-btn') aiRunPricing();
+    if(e.target.id==='ai-run-forecast-btn') aiRunForecast();
+    if(e.target.id==='ai-import-invoice-btn') aiImportFromInvoice();
+    if(e.target.id==='ai-run-report-btn') aiRunReport();
+    if(e.target.id==='ai-copy-report-btn') copyReport();
+    if(e.target.id==='ai-wa-share-btn') shareViaWhatsApp();
+    if(e.target.id==='invoice-drop-zone') document.getElementById('ai-invoice-file')?.click();
+  }, true);
+
+  document.getElementById('content').addEventListener('keydown', e => {
+    if(e.key==='Enter' && e.target.id==='ai-chat-input') aiSendChat();
+  }, true);
+
+  document.getElementById('content').addEventListener('change', e => {
+    if(e.target.id==='ai-invoice-file' && e.target.files[0]) aiScanInvoice(e.target.files[0]);
+  }, true);
+
+  // === ONLINE/OFFLINE STATUS ===
+  window.addEventListener('online', updateStatusStrip);
+  window.addEventListener('offline', updateStatusStrip);
+};
+
+// ════════════════════════════════════════════════════
+// START
+// ════════════════════════════════════════════════════
+initEvents();
+init();
+</script>
+</body>
+</html>
